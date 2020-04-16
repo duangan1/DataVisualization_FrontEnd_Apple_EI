@@ -1,0 +1,25 @@
+@font-face {font-family: "iconfont";
+  src:  url('iconfont.woff?t=1584680691237') format('woff')
+
+}
+
+[class^="app-icon-"], [class*=" app-icon-"]{
+  font-family: "iconfont" !important;
+  speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    vertical-align: baseline;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.el-button [class*="app-icon-"] + span {
+  margin-left: 5px;
+}
+.app-icon-JMP:before {
+  content: "\e603";
+}
+

@@ -1,0 +1,254 @@
+.app-tree-icon {
+  font-size: 14px;
+  .resource_menu {
+    background-color: white;
+  }
+  .resource_menuButton {
+    background-color: blanchedalmond;
+  }
+}
+
+.cust-fieldset {
+  // margin-bottom: 10px;
+  margin-top: 10px;
+  padding: 20px 10px 10px 10px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e6e6e6;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  b {
+    color: #aba9a9;
+  }
+
+  > a {
+    cursor: pointer;
+    position: absolute;
+    top: -9px;
+    background-color: white;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 0 5px;
+    text-align: center;
+    font-family: element-icons !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .el-icon-arrow-down,
+  .el-icon-arrow-right {
+    font-size: 15px;
+  }
+}
+
+.fieldset {
+  margin-top: 10px;
+  padding: 20px 10px 10px 10px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e6e6e6;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  &:before {
+    content: attr(title);
+    cursor: pointer;
+    position: absolute;
+    top: -9px;
+    background-color: white;
+    font-size: 15px;
+    font-weight: bold;
+    width: 80px;
+    text-align: center;
+    font-family: element-icons !important;
+  }
+  &:last-of-type {
+    margin-bottom: 10px;
+  }
+}
+
+.topHeader {
+  width: 100%;
+  height: $topHeaderHeight;
+  position: fixed;
+  top: 0;
+  z-index: 2000;
+  background-color: #2f4e71;
+  border-bottom: 0 solid #d8dce5;
+  .logo {
+    width: 18px;
+
+    vertical-align: middle;
+    margin: 5px 5px 5px 10px;
+  }
+  .title {
+    display: inline-block;
+    margin: 0;
+    color: #fff;
+    font-weight: 600;
+    line-height: 40px;
+    font-size: 14px;
+    padding-left: 5px;
+    font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+    vertical-align: middle;
+  }
+}
+
+.app-container {
+  padding: 10px !important;
+}
+
+.user-dropdown {
+  margin-top: 0;
+}
+
+#nprogress {
+  position: relative;
+  z-index: 9999999;
+}
+.formErrorMessage {
+  list-style: none;
+
+  margin: 0;
+  padding-left: 66px;
+
+  li {
+    padding-left: 1em;
+    text-indent: -0.7em;
+  }
+
+  li::before {
+    content: '\2022 ';
+    color: #e91e63;
+    font-size: 17px;
+  }
+}
+
+.popoverDialog {
+  padding: 0;
+  .title {
+    line-height: 30px;
+    text-indent: 6px;
+    width: 100%;
+    background-color: #f4f4f4;
+    height: 30px;
+  }
+  .myTask {
+    color: red;
+  }
+  .popper__arrow {
+    color: red;
+  }
+  .popper__arrow:after {
+    background-color: #f4f4f4;
+    border-color: #f4f4f4;
+  }
+}
+.table-detail {
+  padding: 0 10px 0 10px;
+  .el-form-item {
+    margin-bottom: 0;
+  }
+}
+.table-expand-content {
+  padding-left: 5px;
+}
+.text-left .el-input__inner {
+  text-align: left !important;
+}
+
+.statuslabel {
+  span {
+    content: ' ';
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    border-radius: 50%;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+  }
+  .pending-approval {
+    background-color: #ffc107;
+  }
+  .PENDING_APPROVAL {
+    background-color: #ffc107;
+  }
+  .approved {
+    background-color: #19be6b;
+  }
+  .APPROVED {
+    background-color: #19be6b;
+  }
+  .rejected {
+    background-color: #ed4014;
+  }
+  .REJECTED {
+    background-color: #ed4014;
+  }
+  .not-started {
+    background-color: #ed4014;
+  }
+  .NOT_STARTED {
+    background-color: #ed4014;
+  }
+  .submitted {
+    background-color: #19be6b;
+  }
+  .SUBMITTED {
+    background-color: #19be6b;
+  }
+  .saved {
+    background-color: #ffc107;
+  }
+  .SAVED {
+    background-color: #ffc107;
+  }
+  .finished {
+    background-color: #33cc33;
+  }
+  .FINISHED {
+    background-color: #33cc33;
+  }
+  .in-progress {
+    background-color: #ffc107;
+  }
+  .IN_PROGRESS {
+    background-color: #ffc107;
+  }
+  .CLOSED {
+    background-color: #33cc33;
+  }
+  .PENDING_FEEDBACK {
+    background-color: #ffc107;
+  }
+}
+
+.table_ellipsis{
+
+  overflow: hidden;
+  text-overflow: ellipsis; //文本溢出显示省略号
+  white-space: nowrap; //文本不会换行
+}
+
+.tool-button {
+  text-align: center;
+  button{
+  margin-top: 5px;
+
+}
+}
+
+.appList{
+    th,   td {
+    border-right:0
+  }
+}
+
+.upload-button{
+  display: initial;
+  margin-right: 10px;
+}

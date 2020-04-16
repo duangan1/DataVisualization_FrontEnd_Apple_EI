@@ -1,0 +1,139 @@
+@import './variables.scss';
+@import './mixin.scss';
+@import './transition.scss';
+@import './element-ui.scss';
+@import './sidebar.scss';
+@import './app.scss';
+body {
+  height: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+}
+
+label {
+  font-weight: 700;
+}
+
+html {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+#app {
+  height: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+a:focus,
+a:active {
+  outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+div:focus {
+  outline: none;
+}
+
+.clearfix {
+  &:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
+}
+
+// main-container global css
+.app-container {
+  padding: 20px;
+}
+.filter-container {
+
+  margin-bottom: 5px;
+  border: 1px solid #dfe6ec;
+  background: #fafafa;
+  padding: 5px;
+    .filter-toolbar{
+     background-color: #fafafa;
+    padding: 5px 10px;
+    border-bottom: 1px solid #dfe6ec;
+    }
+    .filter-content{
+      padding: 5px 10px;
+    }
+    .title{
+      line-height: 30px;
+    font-weight: 500;
+    color: #676b6f;
+    }
+  .filter-item {
+    display: inline-block;
+    vertical-align: middle;
+
+  }
+}
+.action-container{
+  padding: 5px;
+  background-color:  #fafafa;
+  border: 1px solid #ebeef5;
+  border-bottom: none;
+  font-size: 12px;
+  .el-checkbox-group{
+    margin-top: 5px;
+  }
+}
+
+.square-container{
+  padding: 5px;
+
+  border: 1px solid #ebeef5;
+    .el-checkbox-group{
+    margin-top: 5px;
+  }
+}
+
+.menu {
+  z-index: 2001;
+  position: fixed;
+  border: 1px solid #e4e7ed;
+    border-radius: 4px;
+    background-color: #fff;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+    box-sizing: border-box;
+    margin: 5px 0;
+  padding-inline-start: 0px;
+  .menu__item {
+    font-size: 14px;
+    padding: 0 20px;
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #606266;
+    height: 34px;
+    line-height: 34px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+li:hover {
+  background-color: #42b983;
+  color: white;
+}
+}
+
