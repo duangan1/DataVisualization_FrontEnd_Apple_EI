@@ -336,7 +336,7 @@ export default {
 
       //%%%改变后增加%%%
       totalData: [],
-      drawingData: [],
+      // drawingData: [],
       showMoreSelectionPopup: false,//保留
       searchConditions: { ...initialSearchConditions },//保留
       searchMoreConditions: { ...initSearchMoreConditions },//保留
@@ -379,18 +379,11 @@ export default {
       //using test data
       //尚未考虑fetch到多张表的处理逻辑
       this.totalData = dvApi.testData_json();
-      this.drawingData = totalData;
+      // this.drawingData = totalData;
     },
     //这里是在同一张表里筛选 多张表尚未考虑
     changedDrawingData() {
-      //根据searchCondition和SearchMoreCondition的非空项去筛选数据
-      //先完成searchMoreCondition 目前是dim_no
-      let newCondition = this.searchMoreConditions;
-      if(newCondition.dimNo.length != 0){
-        this.drawingData = this.totalData.filter(function(item){
-          return !(newCondition.dimNo.indexOf(item.dim_no) == -1)
-        })
-      }
+      //不再多拷贝一份数据，只在父组件中通过searchCondition去筛选画图的数据
       this.popDataChangedEvent('SM')
       this.showMoreSelectionPopup = false;
     },
@@ -422,7 +415,7 @@ export default {
     fillMoreSearchOptions(){
       // test data, only fill up dimNoLookup
       let data = this.totalData;
-      console.log(data);
+      // console.log(data);
       for (var item of data){
         this.dimNoLookup.push(item.dim_no)
       }
