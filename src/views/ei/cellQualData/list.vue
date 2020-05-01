@@ -146,6 +146,7 @@
       style="width: 100%"
       @current-change="tableCurrentChange"
     >
+      <el-table-column sortable prop="headerId" width="50" label="ID" />
       <el-table-column :label="$t('ei.cellQual.title')" width="350">
         <template scope="scope">{{ scope.row.uploadFileName?scope.row.uploadFileName:scope.row.title }}</template>
       </el-table-column>

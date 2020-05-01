@@ -51,3 +51,11 @@ export function updateChkResult(params) {
     data: params
   })
 }
+
+export function calcData(id) {
+  return request({
+    url: `/ei/summary/header/calc/${id}`,
+    method: 'get'
+  })
+}
+

@@ -8,6 +8,11 @@
           @click="refreshData"
         >{{ $t('core.refreshData') }}</el-button>
         <el-button
+          type="primary"
+          :loading="calcDataLoading"
+          @click="calcData"
+        >{{ $t('core.calcData') }}</el-button>
+        <el-button
           type="infor"
           @click="handleCancel"
         >{{ $t('core.return') }}</el-button>
@@ -445,6 +450,7 @@ export default {
   },
   data() {
     return {
+      calcDataLoading: false,
       dlgUpdChkRsltLoading: false,
       updateChkRsltDto: {
         faiNo: null,
@@ -584,6 +590,33 @@ export default {
         faiSpcAlignmentCheck: null
       }
       this.fetchDetails()
+    },
+    calcData() {
+      MessageBox.confirm(i18n.tc('ei.summary.calcMsg'), i18n.tc('core.tips'), {
+        confirmButtonText: i18n.tc('core.confirm'),
+        type: 'warning',
+        dangerouslyUseHTMLString: true
+      }).then(() => {
+        this.calcDataLoading = true
+        summaryApi.calcData(this.summaryHeaderId).then(response => {
+          this.calcDataLoading = false
+          Message({
+            message: i18n.tc('ei.summary.calcSuccess'),
+            type: 'success',
+            duration: 3 * 1000
+          })
+          this.fetchData(this.summaryHeaderId)
+        }).catch(() => {
+          this.calcDataLoading = false
+        })
+      })
+        .catch(() => {
+          Message({
+            message: i18n.tc('ei.summary.calcCanceled'),
+            type: 'info',
+            duration: 3 * 1000
+          })
+        })
     },
     refreshData() {
       MessageBox.confirm(i18n.tc('ei.summary.refreshMsg'), i18n.tc('core.tips'), {

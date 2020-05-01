@@ -15,7 +15,12 @@ const export_ = {
     vendor: '供应商',
     project: '项目',
     part: '物料',
-    build: '版本'
+    build: '版本',
+    dv: '可视化',
+    lineChart: '折线图',
+    histogramChart: '柱状图',
+    boxplotChart: '箱线图',
+    hotMapChart: '热图'
   },
   core: {
     new: '新建',
@@ -36,6 +41,7 @@ const export_ = {
     detailInfo: '明细信息',
     tips: '提示',
     refreshData: '刷新数据',
+    calcData: '计算',
     saveSuccess: '保存成功',
     deletionSuccess: '删除成功',
     submitSuccess: '提交成功',
@@ -62,6 +68,9 @@ const export_ = {
       refreshMsg: '刷新数据会导致明细信息和检查结果被清空，确定刷新？',
       refreshCanceled: '刷新取消',
       refreshSuccess: '刷新成功',
+      calcMsg: '计算可能导致当前数据丢失，确定计算？',
+      calcCanceled: '计算取消',
+      calcSuccess: '计算成功',
       updateChkResult: '更新检查结果',
       chkResult: '检查结果'
     },
@@ -102,6 +111,13 @@ const export_ = {
       downloadJMP: '下载 JMP',
       message: '错误消息',
       cncSatation: 'CNC Satation'
+    }
+  },
+  dv:{
+    line: {
+      title: '标题',
+      selectMoreBtn: '选择更多',
+      mutlipleRecsFound:'未匹配到唯一原始数据文件，请检查搜索条件！'
     }
   }
 }

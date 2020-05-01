@@ -1,6 +1,6 @@
 const export_ = {
   route: {
-    index: 'Dashboard',
+    index: 'Home',
     security: 'Security',
     user: 'User',
     role: 'Role',
@@ -15,7 +15,12 @@ const export_ = {
     vendor: 'Vendor',
     project: 'Project',
     part: 'Part',
-    build: 'Build'
+    build: 'Build',
+    dv: 'Data Visualization',
+    lineChart: 'Line',
+    histogramChart: 'Histogram',
+    boxplotChart: 'Boxplot',
+    hotMapChart: 'HotMap'
   },
   core: {
     new: 'New',
@@ -37,6 +42,7 @@ const export_ = {
     detailInfo: 'Detail',
     tips: 'Tip',
     refreshData: 'Refresh Data',
+    calcData: 'Calculate',
     saveSuccess: 'Save Success',
     deletionSuccess: 'Deletion Success',
     submitSuccess: 'Submit Success',
@@ -63,6 +69,9 @@ const export_ = {
       refreshMsg: 'Refreshing will delete current Detail list and Checking Result, confirm to refresh?',
       refreshCanceled: 'Refreshing Canceled',
       refreshSuccess: 'Refreshing Success',
+      calcMsg: 'Calculation may result in loss of current data, confirm to calculate?',
+      calcCanceled: 'Calculation Canceled',
+      calcSuccess: 'Calculation Success',
       updateChkResult: 'Update Checking Result',
       chkResult: 'Checking Result'
     },
@@ -104,6 +113,13 @@ const export_ = {
       message: 'Error Message',
       cncSatation: 'CNC Satation',
       updatedAt: 'updated At'
+    } 
+  },
+  dv:{
+    line: {
+      title: 'Title',
+      selectMoreBtn: 'Select More',
+      mutlipleRecsFound:'Unable to locate the unique Cell Qual Data, please check the search condition！'
     }
   }
 }

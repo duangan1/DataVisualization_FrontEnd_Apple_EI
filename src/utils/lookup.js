@@ -60,6 +60,18 @@ export function queryLookupLabel(lookupType, lookupValue) {
   return lookupLabel === '' ? lookupValue : lookupLabel
 }
 
+export function queryLookupValue(lookupType, lookupLabel) {
+  let lookupValue = ''
+
+  lookupType.forEach(lookup => {
+    if (lookup['label'] === lookupLabel) {
+      lookupValue = lookup['value']
+      return
+    }
+  })
+  return lookupValue === '' ? lookupLabel : lookupValue
+}
+
 export const LOOKUP_KEY = {
   Principal: 'principal',
   DataPartition: 'DATA_BELONG',
