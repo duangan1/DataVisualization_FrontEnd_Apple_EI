@@ -303,6 +303,7 @@ import * as messageUtils from "@/utils/messageUtils";
 import { MessageBox, Message,Loading } from 'element-ui'
 import * as cellQualDataApi from "@/api/ei/cellQualData";
 import * as dvApi from "@/api/ei/dv";
+import i18n from '@/i18n'
 
 
 export default {
@@ -390,27 +391,27 @@ export default {
     handleSearch() {
       //using test data
       this.fetchTotalData();
-      this.popDataChangedEvent();
-      // MessageBox.confirm('Do you want to Show Charts or Open the more conditions select window?', i18n.t('core.tips'), {
-      //         showClose:false,
-      //         confirmButtonText: 'Show',
-      //         cancelButtonText: 'Select More',
-      //         type: 'info',
-      //         dangerouslyUseHTMLString: true          
-      //       }).then(() => {            
-      //           setTimeout(() => {
-      //               this.fetchTotalData();
-      //               this.popDataChangedEvent();
-      //           }, 1000)    
-      //       })
-      //       .catch(() => {
-      //           this.popupMoreSearch();
-      //       }) 
+      // this.popDataChangedEvent();
+      MessageBox.confirm('Do you want to Show Charts or Open the more conditions select window?', i18n.t('core.tips'), {
+              showClose:false,
+              confirmButtonText: 'Show',
+              cancelButtonText: 'Select More',
+              type: 'info',
+              dangerouslyUseHTMLString: true          
+            }).then(() => {            
+                this.popDataChangedEvent();
+            })
+            .catch(() => {
+                this.popupMoreSearch();
+            }) 
       
     },
     popupMoreSearch() {
       this.showMoreSelectionPopup = true;
       this.fillMoreSearchOptions();
+    },
+    closeMoreSelectionForm() {
+      this.showMoreSelectionPopup = false;
     },
     fillMoreSearchOptions(){
       // test data, only fill up dimNoLookup

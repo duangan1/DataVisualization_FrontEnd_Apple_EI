@@ -74,13 +74,14 @@ export default {
       }
       //set option to draw
       let option = {
+        backgroundColor: "rgb(250,250,250)",
         title: [
           {
             text: "deviation",
             left: "5%",
             top: "2%",
             textStyle: {
-              fontSize: 20,
+              fontSize: 16,
               color: "black"
             }
           },
@@ -121,6 +122,18 @@ export default {
           //borderWidth: 1,
           //borderColor: '#000',
         },
+          toolbox: {
+            show: true,
+            feature: {
+              dataZoom: {
+                show: true
+              },
+              // dataView: { readOnly: false },
+              // magicType: { type: ["line", "bar"] },
+              restore: {show: true},
+              saveAsImage: {show: true}
+            }
+          },
         xAxis: {
           //X轴
           type: "category", //'category' 类目轴，适用于离散的类目数据，为该类型时必须通过 data 设置类目数据。
@@ -142,7 +155,7 @@ export default {
           },
           splitLine: {
             //坐标轴在 grid 区域中的分隔线。
-            show: true, //是否显示分隔线。默认数值轴显示，类目轴不显示。
+            show: false, //是否显示分隔线。默认数值轴显示，类目轴不显示。
             lineStyle: {
               //分隔线样式
               type: "dashed" //分隔线线的类型。
