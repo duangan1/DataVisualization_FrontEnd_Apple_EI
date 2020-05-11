@@ -1,6 +1,8 @@
 <template>
   <div class="app-container">
-    <OptionBar ref="option" @dataChanged="updateData" />
+    <OptionBar ref="option" 
+    @dataChanged="updateData" 
+    chartType="boxplot"/>
     <title-of-project
       v-show="showVendorProjectTitle"
       :cellQualProjName="cellQual.projName"
@@ -34,10 +36,6 @@ export default {
       plotDataAll: []
     };
   },
-  // mounted() {
-  //     this.plotDataAll = dvApi.testData_json();
-  //     this.initPlot();
-  // },
   methods: {
     //将option组件request到的一些data传递到父组件使用
     updateData(param) {
@@ -54,7 +52,6 @@ export default {
         this.plotDataAll = option.totalData;
       }
     },
-    formatPlotData() {},
     initPlot() {
       let chartDv = this.$refs.chartDv;
       let echart = echarts.init(chartDv);

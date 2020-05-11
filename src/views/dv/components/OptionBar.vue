@@ -308,6 +308,7 @@ import i18n from '@/i18n'
 
 export default {
   name: "OptionBar",
+  props:['chartType'],
   data() {
     return {
       
@@ -379,7 +380,19 @@ export default {
     fetchTotalData() {
       //using test data
       //尚未考虑fetch到多张表的处理逻辑
-      this.totalData = dvApi.testData_json();
+      console.log(this.chartType);
+      if(this.chartType == 'boxplot'){
+        this.totalData = dvApi.testData_json();
+      }
+      else if(this.chartType == 'hotmap'){
+        //调用hotmap的api
+      }
+      else if(this.chartType == 'histogram'){
+        //调用柱状图的api
+      }
+      else{
+        //折线图
+      }
       // this.drawingData = totalData;
     },
     //这里是在同一张表里筛选 多张表尚未考虑
@@ -423,6 +436,8 @@ export default {
       // this.dimNoLookup.push('BM_1');
       
     }
+
+    //下面是师兄原来写的，暂时不用
     // //Search button handler
     // handleSearch() {
     //   this.handleFilter();
