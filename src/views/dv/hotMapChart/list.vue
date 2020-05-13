@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <OptionBar ref="option" @dataChanged="updateData" />
+    <OptionBar ref="option" @dataChanged="updateData"/>
     <title-of-project
       v-show="showVendorProjectTitle"
       :cellQualProjName="cellQual.projName"
