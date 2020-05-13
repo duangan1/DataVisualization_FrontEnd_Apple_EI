@@ -86,7 +86,25 @@ function generateRouteInfo(menu) {
   if (menu.component === 'Layout') {
     menu_.component = Layout
   } else if (menu.component) {
-    menu_.component = () => import(`@/views/${menu.component}`)
+    let url=menu.component
+    // console.log(url)
+    switch(url){
+      case 'dv/histogramChart/list':
+        menu_.component = () => import(`@/views/dv/histogramChart/list`)
+        break;
+      case 'dv/boxplotChart/list':
+        menu_.component = () => import(`@/views/dv/boxplotChart/list`)
+        break;
+      case 'dv/hotMapChart/list':
+        menu_.component = () => import(`@/views/dv/hotMapChart/list`)
+        break;
+      case 'dv/lineChart/list':
+        menu_.component = () => import(`@/views/dv/lineChart/list`)
+        break;
+      default:
+        menu_.component = () => import(`@/views/${url}`)
+    }
+    // menu_.component = () => import(`@/views/dv/lineChart/list`)
   }
 
   if (menu.name) {
