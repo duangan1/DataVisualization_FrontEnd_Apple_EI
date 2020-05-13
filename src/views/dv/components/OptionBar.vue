@@ -304,6 +304,7 @@ import { MessageBox, Message,Loading } from 'element-ui'
 import * as cellQualDataApi from "@/api/ei/cellQualData";
 import * as dvApi from "@/api/ei/dv";
 import i18n from '@/i18n'
+import axios from 'axios'
 
 
 export default {
@@ -386,6 +387,29 @@ export default {
       }
       else if(this.chartType == 'hotmap'){
         //调用hotmap的api
+          // var _this=this
+          let mes = window.location;
+          let _baseurl = `//${mes.hostname}:${mes.port}`;
+          axios({
+          baseURL: _baseurl,   //重写baseURL
+          url: 'api_visual_heat_map/',
+          method: 'post',
+          data: {
+            header_id: '1',
+          }
+        })
+        .then(response =>{
+          // this.data=response.data
+          this.totalData = response.data
+          // post 成功，制response.data 为返回的数百据
+          // console.log(response.data)
+          // return response.data
+        })
+        .catch(error => {
+          // 请求失度败
+          console.log(error)
+        })
+        
       }
       else if(this.chartType == 'histogram'){
         //调用柱状图的api

@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <OptionBar ref="option" @dataChanged="updateData" />
+    <OptionBar ref="option" @dataChanged="updateData" chartType="hotmap"/>
     <title-of-project
       v-show="showVendorProjectTitle"
       :cellQualProjName="cellQual.projName"
@@ -64,27 +64,27 @@ export default {
       }
     },
     formatPlotData() {},
-    getdata(){
-        // var _this=this
-        this.$axios({
-        baseURL: _baseurl,   //重写baseURL
-        url: 'api_visual_heat_map',
-        method: 'post',
-        data: {
-          header_id: '1',
-        }
-      })
-      .then(response =>{
-        this.data=response.data
-        // post 成功，制response.data 为返回的数百据
-        // console.log(response.data)
-        // return response.data
-      })
-      .catch(error => {
-        // 请求失度败
-        console.log(error)
-      })
-    },
+    // getdata(){
+    //     // var _this=this
+    //     this.$axios({
+    //     baseURL: _baseurl,   //重写baseURL
+    //     url: 'api_visual_heat_map',
+    //     method: 'post',
+    //     data: {
+    //       header_id: '1',
+    //     }
+    //   })
+    //   .then(response =>{
+    //     this.data=response.data
+    //     // post 成功，制response.data 为返回的数百据
+    //     // console.log(response.data)
+    //     // return response.data
+    //   })
+    //   .catch(error => {
+    //     // 请求失度败
+    //     console.log(error)
+    //   })
+    // },
 
     initPlot() {
       let chartDv = this.$refs.chartDv;
@@ -333,23 +333,23 @@ export default {
       let mes = window.location;
       let _baseurl = `//${mes.hostname}:${mes.port}`;
       
-      axios({
-        baseURL: _baseurl,   //重写baseURL
-        url: 'api_visual_heat_map/',
-        method: 'post',
-        data: {
-          header_id: '1',
-        }
-      })
-      .then(response =>{
-        this.plotDataAll=response.data
-        // post 成功，制response.data 为返回的数百据
-        // console.log(response.data)
-      })
-      .catch(error => {
-        // 请求失度败
-        console.log(error)
-      })
+      // axios({
+      //   baseURL: _baseurl,   //重写baseURL
+      //   url: 'api_visual_heat_map/',
+      //   method: 'post',
+      //   data: {
+      //     header_id: '1',
+      //   }
+      // })
+      // .then(response =>{
+      //   this.plotDataAll=response.data
+      //   // post 成功，制response.data 为返回的数百据
+      //   // console.log(response.data)
+      // })
+      // .catch(error => {
+      //   // 请求失度败
+      //   console.log(error)
+      // })
       
       let data=this.plotDataAll
       // console.log(data)
