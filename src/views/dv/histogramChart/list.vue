@@ -1,7 +1,8 @@
 <template>
   <div class="app-container">
     <OptionBar ref="option" 
-    @dataChanged="updateData" 
+    @dataChanged="updateData"
+    chartType="histogram" 
    />
     <title-of-project
       v-show="showVendorProjectTitle"

@@ -380,7 +380,7 @@ export default {
     fetchTotalData() {
       //using test data
       //尚未考虑fetch到多张表的处理逻辑
-      console.log(this.chartType);
+      // console.log(this.chartType);
       if(this.chartType == 'boxplot'){
         this.totalData = dvApi.testData_json();
       }
@@ -389,6 +389,7 @@ export default {
       }
       else if(this.chartType == 'histogram'){
         //调用柱状图的api
+        this.totalData = dvApi.testData_json();
       }
       else{
         //折线图
