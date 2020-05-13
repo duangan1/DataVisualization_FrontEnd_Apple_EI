@@ -12,14 +12,14 @@ export function initLineChartMoreSelectOption(params,name) {
     })
 }
 
-export function inithotmapData(params) {
-  console.log(request)
-  return request({
-    url: `/api_visual_heat_map`,
-    method: 'post',
-    params
-  })
-}
+// export function inithotmapData(params) {
+//   console.log(request)
+//   return request({
+//     url: `/api_visual_heat_map`,
+//     method: 'post',
+//     params
+//   })
+// }
 
 export const initLineChartData = (params) => {
     const form = QS.stringify(params, { arrayFormat: 'repeat' })

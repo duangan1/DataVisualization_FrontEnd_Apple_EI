@@ -89,21 +89,6 @@ export default {
     initPlot() {
       let chartDv = this.$refs.chartDv;
       let echart = echarts.init(chartDv);
-
-      // alert('begin')
-      // echart.setOption({
-      //   title: { text: 'ECharts 入门示例' },
-      //   tooltip: {},
-      //   xAxis: {
-      //       data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
-      //   },
-      //   yAxis: {},
-      //   series: [{
-      //       name: '销量',
-      //       type: 'bar',
-      //       data: [5, 20, 36, 10, 10, 20]
-      //   }]
-      // });
       
       // 绘制图表
       // let data={'columns': [1,
@@ -345,31 +330,6 @@ export default {
       //   4.0]]
       // }  
 
-      // dvApi.inithotmapData({
-      //   header_id: '1'
-      // }
-      // ).then(response => {
-      //   if (response.code == "20000") {
-      //     // const renderChartList = [];
-      //     // init chart
-      //     // this.cncMachineNoList.forEach(machine => {
-      //       // console.log("machine:" + machine);
-      //       // const machineChartData = response.data[`${machine}`];
-      //       // if (machineChartData) {
-      //           // setTimeout(() => {
-      //           //  this.initChart('chartDetailArea',machineChartData,this)
-      //       //  }, 1000)               
-      //       // }
-      //     // });
-      //     console.log(response)                    
-      //   }else{
-      //     // this.processLoading = false;
-      //   }
-      // }).catch(()=>{
-      //   console.log('404')
-      //   // this.processLoading = false;
-      // });
-
       let mes = window.location;
       let _baseurl = `//${mes.hostname}:${mes.port}`;
       
@@ -391,22 +351,6 @@ export default {
         console.log(error)
       })
       
-      // let service=axios.create({
-      //   baseURL: 'http://10.242.71.28:5500', // url = base url + request url,
-      //   url: '/api_visual_heat_map',
-      //   withCredentials: false, // send cookies when cross-domain requests
-      //   timeout: 500000 // request timeout
-      // })
-      // axios.defaults.baseURL='http://10.242.71.28:5500'
-      // service.post('/api_visual_heat_map', { header_id: '1'})
-      // .then(response =>{
-      //   // post 成功，制response.data 为返回的数百据
-      //   console.log(response.data)
-      // })
-      // .catch(error => {
-      //   // 请求失度败
-      //   console.log(error)
-      // })
       let data=this.plotDataAll
       // console.log(data)
       let xlabel = data.index
@@ -462,7 +406,7 @@ export default {
                       text = 'Drawing Reject -';
                       break;
               } 
-              return 'Risk Level: ' + text + '<br/>CNC: ' + params.name + '&nbsp&nbsp&nbsp&nbspSPC NO: ' + params.data[1];
+              return 'Risk Level: ' + text + '<br/>CNC: ' + params.name + '&nbsp&nbsp&nbsp&nbspFAI NO: ' + params.data[1];
             },
         },
         animation: false,
