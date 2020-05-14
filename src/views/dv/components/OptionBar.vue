@@ -248,12 +248,7 @@
                 filterable
                 clearable
               >
-                <el-option
-                  v-for="item in dimNoLookup"
-                  :key="item"
-                  :label="item"
-                  :value="item"
-                />
+                <el-option v-for="item in dimNoLookup" :key="item" :label="item" :value="item" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -300,20 +295,18 @@ const initSearchMoreConditions = {
 
 import * as lookup from "@/utils/lookup";
 import * as messageUtils from "@/utils/messageUtils";
-import { MessageBox, Message,Loading } from 'element-ui'
+import { MessageBox, Message, Loading } from "element-ui";
 import * as cellQualDataApi from "@/api/ei/cellQualData";
 import * as dvApi from "@/api/ei/dv";
-import i18n from '@/i18n'
-import axios from 'axios'
-
+import i18n from "@/i18n";
+import axios from "axios";
 
 export default {
   name: "OptionBar",
-  props:['chartType'],
+  props: ["chartType"],
   data() {
     return {
-      
-      initMoreSelectionFilter:"",
+      initMoreSelectionFilter: "",
       moreSelectionFilter: "",
       projectLookup: [],
       vendorLookup: [],
@@ -321,7 +314,7 @@ export default {
       cncStationLookup: [],
       dataRoundLookup: [],
       tableData: [],
-      
+
       processLoading: false,
       currentRow: { status: "", uploadStatus: "" },
       currentPage: 1,
@@ -335,20 +328,19 @@ export default {
       cellQualProjName: "",
       cellQualDate: "",
       cellQualCNCStation: "",
-      
 
       //%%%改变后增加%%%
       totalData: [],
       // drawingData: [],
-      showMoreSelectionPopup: false,//保留
-      searchConditions: { ...initialSearchConditions },//保留
-      searchMoreConditions: { ...initSearchMoreConditions },//保留
+      showMoreSelectionPopup: false, //保留
+      searchConditions: { ...initialSearchConditions }, //保留
+      searchMoreConditions: { ...initSearchMoreConditions }, //保留
       //searchMore 的lookup保留
       cncMachineNoLookup: [],
-      cncMachineNoList:[],
+      cncMachineNoList: [],
       faiNoLookup: [],
       dimNoLookup: [],
-      cutterNoLookup:[]
+      cutterNoLookup: []
     };
   }, //template data
   mounted() {
@@ -356,8 +348,8 @@ export default {
   }, //mounted actions
   methods: {
     // emit a event to tell parent data changed
-    popDataChangedEvent(param){
-      this.$emit('dataChanged',param);
+    popDataChangedEvent(param) {
+      this.$emit("dataChanged", param);
       // 'S'是大条件， 'SM'是select more里的条件
     },
     //get input holdplace and options
@@ -382,67 +374,120 @@ export default {
       //using test data
       //尚未考虑fetch到多张表的处理逻辑
       // console.log(this.chartType);
-      if(this.chartType == 'boxplot'){
-        this.totalData = dvApi.testData_json();
+      let url_type = "";
+      if (this.chartType == "boxplot") {
+        url_type = "boxplot";
+      } else if (this.chartType == "hotmap") {
+        url_type = "heat_map";
+      } else if (this.chartType == "histogram") {
+        url_type = "bar_graph";
+      } else {
+        url_type = "line_chart";
       }
-      else if(this.chartType == 'hotmap'){
-        //调用hotmap的api
-          // var _this=this
-          let mes = window.location;
-          let _baseurl = `//${mes.hostname}:${mes.port}`;
-          axios({
-          baseURL: _baseurl,   //重写baseURL
-          url: 'api_visual_heat_map/',
-          method: 'post',
-          data: {
-            header_id: '1',
-          }
-        })
-        .then(response =>{
-          // this.data=response.data
-          this.totalData = response.data
-          // post 成功，制response.data 为返回的数百据
-          // console.log(response.data)
-          // return response.data
-        })
-        .catch(error => {
-          // 请求失度败
-          console.log(error)
-        })
-        
-      }
-      else if(this.chartType == 'histogram'){
-        //调用柱状图的api
-        this.totalData = dvApi.testData_json();
-      }
-      else{
-        //折线图
-      }
+      // console.log("test");
+      return new Promise((resolve, reject) => {
+        dvApi
+          .getPlotDataByHeaderIdAndType("1", url_type)
+          .then(response => {
+            this.totalData = response;
+            resolve("ok");
+            // console.log(this.totalData);
+          })
+          .catch(error => {
+            reject(error);
+          });
+      });
+
+      // if (this.chartType == "boxplot") {
+      //   // this.totalData = dvApi.testData_json();
+      // } else if (this.chartType == "hotmap") {
+      //   //调用hotmap的api
+      //   // var _this=this
+      //   let mes = window.location;
+      //   let _baseurl = `//${mes.hostname}:${mes.port}`;
+      //   axios({
+      //     baseURL: _baseurl, //重写baseURL
+      //     url: "api_visual_heat_map/",
+      //     method: "post",
+      //     data: {
+      //       header_id: "1"
+      //     }
+      //   })
+      //     .then(response => {
+      //       // this.data=response.data
+      //       this.totalData = response.data;
+      //       // post 成功，制response.data 为返回的数百据
+      //       // console.log(response.data)
+      //       // return response.data
+      //     })
+      //     .catch(error => {
+      //       // 请求失度败
+      //       console.log(error);
+      //     });
+      // } else if (this.chartType == "histogram") {
+      //   //调用柱状图的api
+      //   this.totalData = dvApi.testData_json();
+      // } else {
+      //   //折线图
+      // }
       // this.drawingData = totalData;
     },
     //这里是在同一张表里筛选 多张表尚未考虑
     changedDrawingData() {
       //不再多拷贝一份数据，只在父组件中通过searchCondition去筛选画图的数据
-      this.popDataChangedEvent('SM')
+      this.popDataChangedEvent("SM");
       this.showMoreSelectionPopup = false;
     },
     handleSearch() {
-      //using test data
-      this.fetchTotalData();
-      // this.popDataChangedEvent();
-      MessageBox.confirm('Do you want to Show Charts or Open the more conditions select window?', i18n.t('core.tips'), {
-              showClose:false,
-              confirmButtonText: 'Show',
-              cancelButtonText: 'Select More',
-              type: 'info',
-              dangerouslyUseHTMLString: true          
-            }).then(() => {            
-                this.popDataChangedEvent();
+      this.processLoading = true;
+      this.fetchTotalData()
+        .then(res => {
+          this.processLoading = false;
+          // console.log(this.totalData);
+          MessageBox.confirm(
+            "Do you want to Show Charts or Open the more conditions select window?",
+            i18n.t("core.tips"),
+            {
+              showClose: false,
+              confirmButtonText: "Show",
+              cancelButtonText: "Select More",
+              type: "info",
+              dangerouslyUseHTMLString: true
+            }
+          )
+            .then(() => {
+              this.popDataChangedEvent();
             })
             .catch(() => {
-                this.popupMoreSearch();
-            }) 
-      
+              this.popupMoreSearch();
+            });
+        })
+        .catch(error => {
+          //暂时用alert
+          alert(error);
+        });
+      // else {
+      //   //using test data
+      //   this.fetchTotalData();
+      //   // this.popDataChangedEvent();
+      //   MessageBox.confirm(
+      //     "Do you want to Show Charts or Open the more conditions select window?",
+      //     i18n.t("core.tips"),
+      //     {
+      //       showClose: false,
+      //       confirmButtonText: "Show",
+      //       cancelButtonText: "Select More",
+      //       type: "info",
+      //       dangerouslyUseHTMLString: true
+      //     }
+      //   )
+      //     .then(() => {
+      //       this.popDataChangedEvent();
+      //     })
+      //     .catch(() => {
+      //       this.popupMoreSearch();
+      //     });
+      // }
     },
     popupMoreSearch() {
       this.showMoreSelectionPopup = true;
@@ -451,15 +496,19 @@ export default {
     closeMoreSelectionForm() {
       this.showMoreSelectionPopup = false;
     },
-    fillMoreSearchOptions(){
+    fillMoreSearchOptions() {
       // test data, only fill up dimNoLookup
       let data = this.totalData;
       // console.log(data);
-      for (var item of data){
-        this.dimNoLookup.push(item.dim_no)
+      for (var item of data) {
+        if(this.chartType == "boxplot"){
+          this.dimNoLookup.push(item["dim-point"]);
+        }
+        else if(this.chartType == "histogram"){
+          this.dimNoLookup.push(item.dim_no);
+        }
       }
       // this.dimNoLookup.push('BM_1');
-      
     }
 
     //下面是师兄原来写的，暂时不用
@@ -688,7 +737,7 @@ export default {
     //     this.cncMachineNoLookup.forEach(item =>{
     //       // console.log('item.value:'+item.value);
     //        this.cncMachineNoList.push(item.value);
-    //     })    
+    //     })
     // }
   } //methods
 };

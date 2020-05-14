@@ -4,12 +4,12 @@ import QS from 'qs'
 import axios from 'axios'
 import testData from '@/assets/test_data/raw_data.json'
 
-export function initLineChartMoreSelectOption(params,name) {
-    return request({
-      url: `/ei/dv/line/search/param/${name}`,
-      method: 'get',
-      params
-    })
+export function initLineChartMoreSelectOption(params, name) {
+  return request({
+    url: `/ei/dv/line/search/param/${name}`,
+    method: 'get',
+    params
+  })
 }
 
 // export function inithotmapData(params) {
@@ -22,51 +22,74 @@ export function initLineChartMoreSelectOption(params,name) {
 // }
 
 export const initLineChartData = (params) => {
-    const form = QS.stringify(params, { arrayFormat: 'repeat' })
-    return request({
-      url: `/ei/dv/line/data/machine?${form}`,
-      method: 'get',
-      form
-    })
-  }
+  const form = QS.stringify(params, { arrayFormat: 'repeat' })
+  return request({
+    url: `/ei/dv/line/data/machine?${form}`,
+    method: 'get',
+    form
+  })
+}
 
-  export const initLineChartRiskSuggest = (params) => {
-    const form = QS.stringify(params, { arrayFormat: 'repeat' })
-    return request({
-      url: `/ei/dv/line/risk/suggest?${form}`,
-      method: 'get',
-      form
-    })
-  }
+export const initLineChartRiskSuggest = (params) => {
+  const form = QS.stringify(params, { arrayFormat: 'repeat' })
+  return request({
+    url: `/ei/dv/line/risk/suggest?${form}`,
+    method: 'get',
+    form
+  })
+}
 
-  export const initLineChartRiskMachine = (params) => {
-    const form = QS.stringify(params, { arrayFormat: 'repeat' })
-    return request({
-      url: `/ei/dv/line/risk/machine?${form}`,
-      method: 'get',
-      form
-    })
-  }
+export const initLineChartRiskMachine = (params) => {
+  const form = QS.stringify(params, { arrayFormat: 'repeat' })
+  return request({
+    url: `/ei/dv/line/risk/machine?${form}`,
+    method: 'get',
+    form
+  })
+}
 
 
-  export function submitRiskChkResult(params) {
-    return request({
-      url: `/ei/dv/line/risk/chk/submit`,
+export function submitRiskChkResult(params) {
+  return request({
+    url: `/ei/dv/line/risk/chk/submit`,
+    method: 'post',
+    data: params
+  })
+}
+
+//boxplot test data
+// export const boxplotTestData = () => {
+//   var data = [];
+//   axios.get('../../assets/test_data/raw_data.json').then(response => {
+//     data = response.raw_data;
+//   },response => {
+//     console.log("error")
+//   });
+//   return data;
+// }
+export function testData_json() {
+  return testData;
+}
+
+export function getPlotDataByHeaderIdAndType(header_id,chart_type) {
+  return new Promise((resolve, reject) => {
+    let _url = 'api_visual_';
+    let mes = window.location;
+    let _baseurl = `//${mes.hostname}:${mes.port}`;
+    axios({
+      baseURL: _baseurl,
+      url: _url + chart_type + '/',
       method: 'post',
-      data: params
+      data: {
+        header_id: header_id,
+      }
     })
-  }
-
-  //boxplot test data
-  // export const boxplotTestData = () => {
-  //   var data = [];
-  //   axios.get('../../assets/test_data/raw_data.json').then(response => {
-  //     data = response.raw_data;
-  //   },response => {
-  //     console.log("error")
-  //   });
-  //   return data;
-  // }
-  export function testData_json(){
-    return testData;
-  }
+      .then(response => {
+        resolve(response.data);
+      })
+      .catch(error => {
+        reject(error.data);
+      });
+  })
+  // return data_json;
+}
