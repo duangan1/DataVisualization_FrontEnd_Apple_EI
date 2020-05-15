@@ -46,7 +46,7 @@ export default {
       let dimNo = option.searchMoreConditions.dimNo;
       if (dimNo != 0) {
         this.plotDataAll = option.totalData.filter(function(item) {
-          return !(dimNo.indexOf(item.dim_no) == -1);
+          return !(dimNo.indexOf(item['dim-point']) == -1);
         });
       } else {
         this.plotDataAll = option.totalData;
@@ -59,15 +59,15 @@ export default {
       let xAxisData = [];
       for (var item of this.plotDataAll) {
         plotdata.push(item.deviation);
-        xAxisData.push(item.dim_no);
+        xAxisData.push(item['dim-point']);
       }
       //use dataTool to format data
       let data = echarts.dataTool.prepareBoxplotData(plotdata);
       for (var i = 0; i < plotdata.length; i++) {
-        data.boxData[i].push(this.plotDataAll[i].tol_max);
-        data.boxData[i].push(this.plotDataAll[i].tol_min);
-        data.boxData[i].push(this.plotDataAll[i].tol_sip_max);
-        data.boxData[i].push(this.plotDataAll[i].tol_sip_min);
+        data.boxData[i].push(this.plotDataAll[i].tol_max_plus);
+        data.boxData[i].push(this.plotDataAll[i].tol_max_minus);
+        data.boxData[i].push(this.plotDataAll[i].sip_tol_plus);
+        data.boxData[i].push(this.plotDataAll[i].sip_tol_minus);
       }
       //set option to draw
       let option = {
@@ -215,7 +215,7 @@ export default {
             itemStyle: {
               //盒须图样式。
               //color: '#fff', //boxplot图形的颜色。 默认从全局调色盘 option.color 获取颜色
-              borderColor: "blue" //boxplot图形的描边颜色。支持的颜色格式同 color，不支持回调函数。
+              borderColor: "#1E90FF" //boxplot图形的描边颜色。支持的颜色格式同 color，不支持回调函数。
             },
             data: data.boxData,
             tooltip: {

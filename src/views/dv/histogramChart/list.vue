@@ -1,7 +1,8 @@
 <template>
   <div class="app-container">
     <OptionBar ref="option" 
-    @dataChanged="updateData" 
+    @dataChanged="updateData"
+    chartType="histogram" 
    />
     <title-of-project
       v-show="showVendorProjectTitle"
@@ -62,7 +63,7 @@ export default {
       let plotdata = [];
       let xAxisData = [];
       for (var item of this.plotDataAll) {
-        plotdata.push(item.projected_yeild);
+        plotdata.push(item.projected_yields);
         xAxisData.push(item.dim_no);
       }
     //   //use dataTool to format data
@@ -149,7 +150,7 @@ export default {
           axisLabel: {
             //坐标轴刻度标签的相关设置。
             //formatter: 'expr {value}',  // 使用字符串模板，模板变量为刻度默认标签 {value}
-            show: false, //是否显示刻度标签。
+            show: true, //是否显示刻度标签。
             //interval: 'auto', //坐标轴刻度标签的显示间隔，在类目轴中有效。
             color: "black"
           },
