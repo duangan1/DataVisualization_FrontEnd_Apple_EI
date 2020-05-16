@@ -8,7 +8,8 @@
       v-show="showVendorProjectTitle"
       :cellQualProjName="cellQual.projName"
       :cellQualVendorName="cellQual.vendorName"
-    />
+      
+    > Projected Yields </title-of-project>
     <div ref="chartDv" style="width: 100%;height: 600px"></div>
   </div>
 </template>
@@ -21,7 +22,7 @@ import "echarts/dist/extension/dataTool";
 //test plot
 import * as dvApi from "@/api/ei/dv";
 export default {
-  name: "historgramChart",
+  name: "histogramChart",
   components: {
     OptionBar,
     TitleOfProject
@@ -44,8 +45,9 @@ export default {
     //将option组件request到的一些data传递到父组件使用
     updateData(param) {
       let option = this.$refs.option;
-      this.cellQual.projName = option.cellQualProjName;
-      this.cellQual.vendorName = option.cellqualVenderName;
+      this.cellQual.projName = option.project;
+      this.cellQual.vendorName = option.vendor;
+      this.showVendorProjectTitle = true;
       //目前只筛选dimNo
       let dimNo = option.searchMoreConditions.dimNo;
       if (dimNo != 0) {
@@ -151,7 +153,7 @@ export default {
             //坐标轴刻度标签的相关设置。
             //formatter: 'expr {value}',  // 使用字符串模板，模板变量为刻度默认标签 {value}
             show: true, //是否显示刻度标签。
-            //interval: 'auto', //坐标轴刻度标签的显示间隔，在类目轴中有效。
+            interval: 'auto', //坐标轴刻度标签的显示间隔，在类目轴中有效。
             color: "black"
           },
           splitLine: {
@@ -213,23 +215,10 @@ export default {
          dataZoom: [
             {
                 show: true,
-                start: 72,
-                end: 100
+                realtime: true,
+                start: 0,
+                end: 30
             },
-            {
-                type: 'inside',
-                start: 72,
-                end: 100
-            },
-            {
-                show: true,
-                yAxisIndex: 0,
-                filterMode: 'empty',
-                width: 30,
-                height: '80%',
-                showDataShadow: false,
-                left: '93%'
-            }
         ],
         series: [
           {

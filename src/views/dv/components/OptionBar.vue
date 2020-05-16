@@ -638,7 +638,7 @@ export default {
       this.vendor = "";
       this.build = "";
       this.partNo = "";
-      this.cncStationLookup = "";
+      this.cncStation = "";
       this.dataround = "";
     },
     popupMoreSearch() {

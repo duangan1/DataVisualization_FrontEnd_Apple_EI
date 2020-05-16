@@ -5,9 +5,10 @@
       v-show="showVendorProjectTitle"
       :cellQualProjName="cellQual.projName"
       :cellQualVendorName="cellQual.vendorName"
-    />
+      
+    > Risk Level Hotmap </title-of-project>
     <div ref="chartDv" style="width: 100%;height: 1000px">
-        <h1>hotmap</h1>
+        <!-- <h1>hotmap</h1> -->
     </div>
   </div>
 </template>
@@ -51,8 +52,9 @@ export default {
     //将option组件request到的一些data传递到父组件使用
     updateData(param) {
       let option = this.$refs.option;
-      this.cellQual.projName = option.cellQualProjName;
-      this.cellQual.vendorName = option.cellqualVenderName;
+      this.cellQual.projName = option.project;
+      this.cellQual.vendorName = option.vendor;
+      this.showVendorProjectTitle = true;
       //目前只筛选dimNo
       let dimNo = option.searchMoreConditions.dimNo;
       if (dimNo != 0) {
