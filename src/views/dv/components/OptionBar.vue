@@ -1,105 +1,72 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="3">
-        <el-input
-          v-show="false"
-          v-model="searchConditions.title"
-          class="filter-item"
-          style="width: 99%;"
-          clearable
-          placeholder="Title"
-        />
-      </el-col>
       <el-col :span="4">
         <el-select
-          v-model="searchConditions.project"
+          v-model="project"
           class="filter-item"
           style="width: 99%;"
           placeholder="Project"
           clearable
         >
-          <el-option
-            v-for="item in projectLookup"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
+          <el-option v-for="item in projectLookup" :key="item" :label="item" :value="item" />
         </el-select>
       </el-col>
       <el-col :span="3">
-        <el-input
-          v-model="searchConditions.partNo"
+        <el-select
+          v-model="partNo"
           class="filter-item"
           style="width: 99%;"
           placeholder="Part NO."
           clearable
-        />
+        >
+          <el-option v-for="item in partNoLookup" :key="item" :label="item" :value="item" />
+        </el-select>
       </el-col>
       <el-col :span="4">
         <el-select
-          v-model="searchConditions.vendor"
+          v-model="vendor"
           class="filter-item"
           style="width: 99%;"
           placeholder="Vendor"
           clearable
         >
-          <el-option
-            v-for="item in vendorLookup"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
+          <el-option v-for="item in vendorLookup" :key="item" :label="item" :value="item" />
         </el-select>
       </el-col>
       <el-col :span="2">
         <el-select
-          v-model="searchConditions.build"
+          v-model="build"
           class="filter-item"
           style="width: 99%;"
           placeholder="Build"
           clearable
         >
-          <el-option
-            v-for="item in buildLookup"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
+          <el-option v-for="item in buildLookup" :key="item" :label="item" :value="item" />
         </el-select>
       </el-col>
 
       <el-col :span="2">
         <el-select
-          v-model="searchConditions.cncSatation"
+          v-model="cncSatation"
           class="filter-item"
           style="width: 99%;"
           placeholder="CNC#"
           clearable
         >
-          <el-option
-            v-for="item in cncStationLookup"
-            :key="item.label"
-            :label="item.label"
-            :value="item.label"
-          />
+          <el-option v-for="item in cncStationLookup" :key="item" :label="item" :value="item" />
         </el-select>
       </el-col>
 
       <el-col :span="2">
         <el-select
-          v-model="searchConditions.dataround"
+          v-model="dataround"
           class="filter-item"
           style="width: 99%;"
           placeholder="Data Round"
           clearable
         >
-          <el-option
-            v-for="item in dataRoundLookup"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
+          <el-option v-for="item in dataRoundLookup" :key="item" :label="item" :value="item" />
         </el-select>
       </el-col>
 
@@ -309,11 +276,12 @@ export default {
       initMoreSelectionFilter: "",
       moreSelectionFilter: "",
       projectLookup: [],
+      partNoLookup: [],
       vendorLookup: [],
       buildLookup: [],
       cncStationLookup: [],
       dataRoundLookup: [],
-      tableData: [],
+      // tableData: [],
 
       processLoading: false,
       currentRow: { status: "", uploadStatus: "" },
@@ -331,7 +299,8 @@ export default {
 
       //%%%改变后增加%%%
       totalData: [],
-      // drawingData: [],
+      totalOption: [],
+      selectingOption: [],
       showMoreSelectionPopup: false, //保留
       searchConditions: { ...initialSearchConditions }, //保留
       searchMoreConditions: { ...initSearchMoreConditions }, //保留
@@ -340,12 +309,74 @@ export default {
       cncMachineNoList: [],
       faiNoLookup: [],
       dimNoLookup: [],
-      cutterNoLookup: []
+      cutterNoLookup: [],
+      //把searchConditions对象拆开来以方便watch
+      project: "",
+      vendor: "",
+      build: "",
+      partNo: "",
+      cncSatation: "",
+      dataround: ""
     };
   }, //template data
   mounted() {
-    this.fetchLookup();
+    this.fetchLookup2();
   }, //mounted actions
+  watch: {
+    // searchConditions: function(newval,oldval){
+    //   console.log("condition changed");
+    //   let nullCnt = 6;
+    //   for(let key in this.searchConditions){
+    //     if(this.searchConditions[key]){
+    //       nullCnt -= 1;
+    //       filtOptionLookup(key);
+    //     }
+    //   }
+    //   if(nullCnt == 6){
+    //     this.selectingOption = this.totalOption;
+    //   }
+    // },
+    // selectingOption: function(newval,oldval){
+    //   console.log('selecting option changed');
+    //   this.fillOptionLookup();
+    // },
+    // searchConditions: function(newval,oldval){
+    //   console.log('condition changedd');
+    //   console.log('condition changedd');
+    //   console.log('condition changedd');
+    //   console.log('condition changedd');
+    // },
+    project: function(newval, oldval) {
+      console.log("project changed:" + this.project);
+      this.doFiltOptionLookup();
+      console.log(this.selectingOption);
+    },
+    vendor: function(newval, oldval) {
+      console.log("vendor changed:" + this.vendor);
+      this.doFiltOptionLookup();
+      console.log(this.selectingOption);
+    },
+    build: function(newval, oldval) {
+      console.log("build changed:" + this.build);
+      this.doFiltOptionLookup();
+      console.log(this.selectingOption);
+    },
+    partNo: function(newval, oldval) {
+      console.log("partNo changed:" + this.partNo);
+      this.doFiltOptionLookup();
+      console.log(this.selectingOption);
+    },
+    cncSatation: function(newval, oldval) {
+      console.log("cncSatation changed:" + this.cncSatation);
+      this.doFiltOptionLookup();
+      console.log(this.selectingOption);
+    },
+    dataround: function(newval, oldval) {
+      console.log("dataround changed:" + this.dataround);
+      this.doFiltOptionLookup();
+      console.log(this.selectingOption);
+    }
+  },
   methods: {
     // emit a event to tell parent data changed
     popDataChangedEvent(param) {
@@ -370,7 +401,122 @@ export default {
         });
     },
     //%%%改变后增加%%%
-    fetchTotalData() {
+    fetchLookup2() {
+      dvApi
+        .getOptionLookup()
+        .then(res => {
+          this.totalOption = res;
+          this.selectingOption = this.totalOption;
+          this.fillOptionLookup();
+          // console.log(this.totalOption);
+          // this.fillOptionLookup();
+          // console.log(this.projectLookup);
+        })
+        .catch(err => {
+          //暂时用alert
+          alert(err);
+        });
+    },
+    fillOptionLookup() {
+      this.clearOptionLookup();
+      for (var item of this.selectingOption) {
+        if (item.project && this.projectLookup.indexOf(item.project) == -1) {
+          this.projectLookup.push(item.project);
+        }
+        if (item.vendor && this.vendorLookup.indexOf(item.vendor) == -1) {
+          this.vendorLookup.push(item.vendor);
+        }
+        if (item.build && this.buildLookup.indexOf(item.build) == -1) {
+          this.buildLookup.push(item.build);
+        }
+        if (
+          item.cnc_satation &&
+          this.cncStationLookup.indexOf(item.cnc_satation) == -1
+        ) {
+          this.cncStationLookup.push(item.cnc_satation);
+        }
+        if (
+          item.data_round &&
+          this.dataRoundLookup.indexOf(item.data_round) == -1
+        ) {
+          this.dataRoundLookup.push(item.data_round);
+        }
+        if (item.part_no && this.partNoLookup.indexOf(item.part_no) == -1) {
+          this.partNoLookup.push(item.part_no);
+        }
+      }
+      // console.log(this.partNoLookup);
+    },
+    clearOptionLookup() {
+      this.projectLookup = [];
+      this.vendorLookup = [];
+      this.buildLookup = [];
+      this.partNoLookup = [];
+      this.cncStationLookup = [];
+      this.dataRoundLookup = [];
+    },
+    doFiltOptionLookup() {
+      this.selectingOption = this.totalOption;
+      // this.clearOptionLookup();
+      if (this.project != "") {
+        this.filtOptionLookup("project");
+      }
+      if (this.vendor != "") {
+        this.filtOptionLookup("vendor");
+      }
+      if (this.build != "") {
+        this.filtOptionLookup("build");
+      }
+      if (this.partNo != "") {
+        this.filtOptionLookup("partNo");
+      }
+      if (this.cncSatation != "") {
+        this.filtOptionLookup("cncSatation");
+      }
+      if (this.dataround != "") {
+        this.filtOptionLookup("dataround");
+      }
+      this.fillOptionLookup();
+    },
+    filtOptionLookup(param) {
+      if (param == "project") {
+        let temp = this.project;
+        this.selectingOption = this.selectingOption.filter(function(item) {
+          return item.project == temp;
+        });
+      }
+      if (param == "partNo") {
+        let temp = this.partNo;
+        this.selectingOption = this.selectingOption.filter(function(item) {
+          return item.part_no == temp;
+        });
+      }
+      if (param == "vendor") {
+        let temp = this.vendor;
+        this.selectingOption = this.selectingOption.filter(function(item) {
+          return item.vendor == temp;
+        });
+      }
+      if (param == "build") {
+        let temp = this.build;
+        this.selectingOption = this.selectingOption.filter(function(item) {
+          return item.build == temp;
+        });
+      }
+      if (param == "cncStation") {
+        let temp = this.cncSatation;
+        this.selectingOption = this.selectingOption.filter(function(item) {
+          return item.cnc_satation == temp;
+        });
+      }
+      if (param == "dataround") {
+        let temp = this.dataround;
+        this.selectingOption = this.selectingOption.filter(function(item) {
+          return item.data_round == temp;
+        });
+      }
+    },
+    fetchTotalData(header_id) {
       //using test data
       //尚未考虑fetch到多张表的处理逻辑
       // console.log(this.chartType);
@@ -387,7 +533,7 @@ export default {
       // console.log("test");
       return new Promise((resolve, reject) => {
         dvApi
-          .getPlotDataByHeaderIdAndType("1", url_type)
+          .getPlotDataByHeaderIdAndType(header_id, url_type)
           .then(response => {
             this.totalData = response;
             resolve("ok");
@@ -439,55 +585,61 @@ export default {
       this.showMoreSelectionPopup = false;
     },
     handleSearch() {
-      this.processLoading = true;
-      this.fetchTotalData()
-        .then(res => {
-          this.processLoading = false;
-          // console.log(this.totalData);
-          MessageBox.confirm(
-            "Do you want to Show Charts or Open the more conditions select window?",
-            i18n.t("core.tips"),
-            {
-              showClose: false,
-              confirmButtonText: "Show",
-              cancelButtonText: "Select More",
-              type: "info",
-              dangerouslyUseHTMLString: true
-            }
-          )
-            .then(() => {
-              this.popDataChangedEvent();
-            })
-            .catch(() => {
-              this.popupMoreSearch();
-            });
-        })
-        .catch(error => {
-          //暂时用alert
-          alert(error);
-        });
-      // else {
-      //   //using test data
-      //   this.fetchTotalData();
-      //   // this.popDataChangedEvent();
-      //   MessageBox.confirm(
-      //     "Do you want to Show Charts or Open the more conditions select window?",
-      //     i18n.t("core.tips"),
-      //     {
-      //       showClose: false,
-      //       confirmButtonText: "Show",
-      //       cancelButtonText: "Select More",
-      //       type: "info",
-      //       dangerouslyUseHTMLString: true
-      //     }
-      //   )
-      //     .then(() => {
-      //       this.popDataChangedEvent();
-      //     })
-      //     .catch(() => {
-      //       this.popupMoreSearch();
-      //     });
-      // }
+      //判断所选条件是否唯一确定一张表
+      let header_id = "";
+      if (this.selectingOption.length == 1) {
+        //判断是取 cell qual data 表，还是dim summary 表
+        if (this.chartType == "hotmap") {
+          header_id = this.selectingOption[0].dim_header_id;
+        } else {
+          header_id = this.selectingOption[0].cell_header_id;
+        }
+      } else {
+        //未能唯一确定header_id
+        alert("please select the rest options");
+      }
+      //判断head_id是否为空
+      if (header_id) {
+        // console.log(this.searchConditions);
+        this.processLoading = true;
+        this.fetchTotalData(header_id)
+          .then(res => {
+            this.processLoading = false;
+            // console.log(this.totalData);
+            MessageBox.confirm(
+              "Do you want to Show Charts or Open the more conditions select window?",
+              i18n.t("core.tips"),
+              {
+                showClose: false,
+                confirmButtonText: "Show",
+                cancelButtonText: "Select More",
+                type: "info",
+                dangerouslyUseHTMLString: true
+              }
+            )
+              .then(() => {
+                this.popDataChangedEvent();
+              })
+              .catch(() => {
+                this.popupMoreSearch();
+              });
+          })
+          .catch(error => {
+            //暂时用alert
+            alert(error);
+          });
+      }
+      else{
+        alert("no data suitable for these option yet");
+      }
+    },
+    handleReset() {
+      this.project = "";
+      this.vendor = "";
+      this.build = "";
+      this.partNo = "";
+      this.cncStation = "";
+      this.dataround = "";
     },
     popupMoreSearch() {
       this.showMoreSelectionPopup = true;
@@ -501,10 +653,9 @@ export default {
       let data = this.totalData;
       // console.log(data);
       for (var item of data) {
-        if(this.chartType == "boxplot"){
+        if (this.chartType == "boxplot") {
           this.dimNoLookup.push(item["dim-point"]);
-        }
-        else if(this.chartType == "histogram"){
+        } else if (this.chartType == "histogram") {
           this.dimNoLookup.push(item.dim_no);
         }
       }

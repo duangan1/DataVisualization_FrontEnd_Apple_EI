@@ -7,7 +7,8 @@
       v-show="showVendorProjectTitle"
       :cellQualProjName="cellQual.projName"
       :cellQualVendorName="cellQual.vendorName"
-    />
+      
+    > Deviation Boxplot </title-of-project>
     <div ref="chartDv" style="width: 100%;height: 600px"></div>
   </div>
 </template>
@@ -21,7 +22,7 @@ import "echarts/dist/extension/dataTool";
 import * as dvApi from "@/api/ei/dv";
 
 export default {
-  name: "BoxplotChart",
+  name: "boxplotChart",
   components: {
     OptionBar,
     TitleOfProject
@@ -40,8 +41,9 @@ export default {
     //将option组件request到的一些data传递到父组件使用
     updateData(param) {
       let option = this.$refs.option;
-      this.cellQual.projName = option.cellQualProjName;
-      this.cellQual.vendorName = option.cellqualVenderName;
+      this.cellQual.projName = option.project;
+      this.cellQual.vendorName = option.vendor;
+      this.showVendorProjectTitle = true;
       //目前只筛选dimNo
       let dimNo = option.searchMoreConditions.dimNo;
       if (dimNo != 0) {
@@ -73,15 +75,15 @@ export default {
       let option = {
         backgroundColor: "rgb(250,250,250)",
         title: [
-          {
-            text: "deviation",
-            left: "5%",
-            top: "2%",
-            textStyle: {
-              fontSize: 16,
-              color: "black"
-            }
-          },
+          // {
+          //   text: "deviation",
+          //   left: "10px",
+          //   top: "2%",
+          //   textStyle: {
+          //     fontSize: 16,
+          //     color: "black"
+          //   }
+          // },
           {
             text: "Dim. No",
             //borderColor: '#999',
@@ -146,8 +148,8 @@ export default {
           axisLabel: {
             //坐标轴刻度标签的相关设置。
             //formatter: 'expr {value}',  // 使用字符串模板，模板变量为刻度默认标签 {value}
-            show: false, //是否显示刻度标签。
-            //interval: 'auto', //坐标轴刻度标签的显示间隔，在类目轴中有效。
+            show: true, //是否显示刻度标签。
+            interval: 'auto', //坐标轴刻度标签的显示间隔，在类目轴中有效。
             color: "black"
           },
           splitLine: {
@@ -179,6 +181,7 @@ export default {
         yAxis: {
           //y轴
           type: "value",
+          name: "deviation",
           splitArea: {
             //坐标轴在 grid 区域中的分隔区域，默认不显示。
             //show: true
@@ -206,6 +209,14 @@ export default {
             }
           }
         },
+        dataZoom: [
+          {
+            show: true,
+            realtime: true,
+            start: 0,
+            end: 10
+          }
+        ],
         series: [
           {
             name: "boxplot", //箱形图

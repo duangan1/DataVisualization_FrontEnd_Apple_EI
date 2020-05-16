@@ -93,3 +93,22 @@ export function getPlotDataByHeaderIdAndType(header_id,chart_type) {
   })
   // return data_json;
 }
+
+export function getOptionLookup(){
+  return new Promise((resolve,reject) => {
+    let mes = window.location;
+    let _baseurl = `//${mes.hostname}:${mes.port}`;
+    axios({
+      baseURL: _baseurl,
+      url: '/get_header_id/',
+      method: 'get',
+    })
+    .then(res => {
+      // console.log(res.data);
+      resolve(res.data);
+    })
+    .catch(err => {
+      reject(err.data);
+    })
+  })
+}
