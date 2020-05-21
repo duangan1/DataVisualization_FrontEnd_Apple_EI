@@ -86,25 +86,9 @@ function generateRouteInfo(menu) {
   if (menu.component === 'Layout') {
     menu_.component = Layout
   } else if (menu.component) {
-    let url=menu.component
-    // console.log(url)
-    switch(url){
-      case 'dv/histogramChart/list':
-        menu_.component = () => import(`@/views/dv/histogramChart/list`)
-        break;
-      case 'dv/boxplotChart/list':
-        menu_.component = () => import(`@/views/dv/boxplotChart/list`)
-        break;
-      case 'dv/hotMapChart/list':
-        menu_.component = () => import(`@/views/dv/hotMapChart/list`)
-        break;
-      case 'dv/lineChart/list':
-        menu_.component = () => import(`@/views/dv/lineChart/list`)
-        break;
-      default:
-        menu_.component = () => import(`@/views/${url}`)
-    }
-    // menu_.component = () => import(`@/views/dv/lineChart/list`)
+    // menu_.component = () => import(`@/views/${menu.component}`)
+    menu_.component = resolve => require([`@/views/${menu.component}`], resolve)
+    // 解决方法详见 https://blog.csdn.net/Cookysurongbin/article/details/99307933 的评论
   }
 
   if (menu.name) {
