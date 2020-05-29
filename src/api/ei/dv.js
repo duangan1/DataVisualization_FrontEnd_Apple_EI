@@ -2,7 +2,7 @@ import request from '@/utils/request'
 import QS from 'qs'
 //test data
 import axios from 'axios'
-import testData from '@/assets/test_data/raw_data.json'
+import testData from '@/assets/test_data/linechart_test.json'
 
 export function initLineChartMoreSelectOption(params, name) {
   return request({
