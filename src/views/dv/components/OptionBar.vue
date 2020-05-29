@@ -653,8 +653,8 @@ export default {
       let data = this.totalData;
       // console.log(data);
       for (var item of data) {
-        if (this.chartType == "boxplot") {
-          this.dimNoLookup.push(item["dim-point"]);
+        if (this.chartType == "boxplot" && this.dimNoLookup.indexOf(item["dim_no"])==-1) {
+          this.dimNoLookup.push(item["dim_no"]);
         } else if (this.chartType == "histogram") {
           this.dimNoLookup.push(item.dim_no);
         }

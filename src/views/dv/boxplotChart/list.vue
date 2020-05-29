@@ -48,7 +48,7 @@ export default {
       let dimNo = option.searchMoreConditions.dimNo;
       if (dimNo != 0) {
         this.plotDataAll = option.totalData.filter(function(item) {
-          return !(dimNo.indexOf(item['dim-point']) == -1);
+          return !(dimNo.indexOf(item['dim_no']) == -1);
         });
       } else {
         this.plotDataAll = option.totalData;
