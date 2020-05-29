@@ -38,36 +38,36 @@ module.exports = {
     },
     // proxy: 'http://127.0.0.1',
     proxy: {
-      '/api_visual_heat_map/': {
-        target: 'http://139.155.34.215:5500', // 接口的域名
+      '/python_api/api_visual_heat_map/': {
+        target: 'http://120.26.177.17:5500', // 接口的域名
       // secure: false,  // 如果是https接口，需要配置这个参数
       changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
       pathRewrite: {
-        '^/api_visual_heat_map/': '/api_visual_heat_map/'
+        '^ /python_api/api_visual_heat_map/': '/python_api/api_visual_heat_map/'
        }
       },
-      '/api_visual_boxplot/':{
-        target: 'http://139.155.34.215:5500', // 接口的域名
+      '/python_api/api_visual_boxplot/':{
+        target: 'http://120.26.177.17:5500', // 接口的域名
         // secure: false,  // 如果是https接口，需要配置这个参数
         changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
         pathRewrite: {
-          '^/api_visual_boxplot/': '/api_visual_boxplot/'
+          '^/python_api/api_visual_boxplot/': '/python_api/api_visual_boxplot/'
          }
       }, 
-      '/api_visual_bar_graph/':{
-        target: 'http://139.155.34.215:5500', // 接口的域名
+      '/python_api/api_visual_bar_graph/':{
+        target: 'http://120.26.177.17:5500', // 接口的域名
         // secure: false,  // 如果是https接口，需要配置这个参数
         changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
         pathRewrite: {
-          '^/api_visual_bar_graph/': '/api_visual_bar_graph/'
+          '^/python_api/api_visual_bar_graph/': '/python_api/api_visual_bar_graph/'
          }
       }, 
-      '/get_header_id/':{
-        target: 'http://139.155.34.215:5500', // 接口的域名
+      '/python_api/get_header_id/':{
+        target: 'http://120.26.177.17:5500', // 接口的域名
         // secure: false,  // 如果是https接口，需要配置这个参数
         changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
         pathRewrite: {
-          '^/get_header_id/': '/get_header_id/'
+          '^/python_api/get_header_id/': '/python_api/get_header_id/'
          }
       }
     },

@@ -48,7 +48,7 @@
 
       <el-col :span="2">
         <el-select
-          v-model="cncSatation"
+          v-model="cncStation"
           class="filter-item"
           style="width: 99%;"
           placeholder="CNC#"
@@ -315,7 +315,7 @@ export default {
       vendor: "",
       build: "",
       partNo: "",
-      cncSatation: "",
+      cncStation: "",
       dataround: ""
     };
   }, //template data
@@ -366,8 +366,8 @@ export default {
       this.doFiltOptionLookup();
       console.log(this.selectingOption);
     },
-    cncSatation: function(newval, oldval) {
-      console.log("cncSatation changed:" + this.cncSatation);
+    cncStation: function(newval, oldval) {
+      console.log("cncStation changed:" + this.cncStation);
       this.doFiltOptionLookup();
       console.log(this.selectingOption);
     },
@@ -470,8 +470,8 @@ export default {
       if (this.partNo != "") {
         this.filtOptionLookup("partNo");
       }
-      if (this.cncSatation != "") {
-        this.filtOptionLookup("cncSatation");
+      if (this.cncStation != "") {
+        this.filtOptionLookup("cncStation");
       }
       if (this.dataround != "") {
         this.filtOptionLookup("dataround");
@@ -504,7 +504,7 @@ export default {
         });
       }
       if (param == "cncStation") {
-        let temp = this.cncSatation;
+        let temp = this.cncStation;
         this.selectingOption = this.selectingOption.filter(function(item) {
           return item.cnc_satation == temp;
         });
@@ -699,7 +699,7 @@ export default {
     //       this.filter + ",t.dataRound EQ " + this.searchConditions.dataround;
     //   }
 
-    //   if (this.searchConditions.cncSatation !== "") {
+    //   if (this.searchConditions.cncStation !== "") {
     //     this.filter =
     //       this.filter +
     //       ",t.cncSatation EQ " +

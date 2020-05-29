@@ -73,7 +73,7 @@ export function testData_json() {
 
 export function getPlotDataByHeaderIdAndType(header_id,chart_type) {
   return new Promise((resolve, reject) => {
-    let _url = 'api_visual_';
+    let _url = '/python_api/api_visual_';
     let mes = window.location;
     let _baseurl = `//${mes.hostname}:${mes.port}`;
     axios({
@@ -100,7 +100,7 @@ export function getOptionLookup(){
     let _baseurl = `//${mes.hostname}:${mes.port}`;
     axios({
       baseURL: _baseurl,
-      url: '/get_header_id/',
+      url: '/python_api/get_header_id/',
       method: 'get',
     })
     .then(res => {
