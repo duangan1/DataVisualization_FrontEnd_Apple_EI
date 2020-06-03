@@ -527,8 +527,8 @@ export default {
         url_type = "heat_map";
       } else if (this.chartType == "histogram") {
         url_type = "bar_graph";
-      } else {
-        url_type = "line_chart";
+      } else if(this.chartType == "line_chart"){
+        url_type = "linechart";
       }
       // console.log("test");
       return new Promise((resolve, reject) => {
