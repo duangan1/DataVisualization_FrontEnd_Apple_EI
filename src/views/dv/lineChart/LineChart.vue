@@ -6,29 +6,47 @@
       :cellQualProjName="cellQual.projName"
       :cellQualVendorName="cellQual.vendorName"
     >Deviation LineChart</title-of-project>
+    <!-- main view part -->
+    <!-- dim select part -->
+    <div
+      style="width:20%;position:fixed;overflow-x: hidden;overflow-y:scroll;"
+      class="dim-filter"
+      v-show="showVendorProjectTitle"
+    >
+      <h style="margin-bottom:8px">Dim No</h>
+      <el-checkbox-group
+        v-model="selectingDimNo"
+        class="dimNoCheckBox"
+        style="height:400px;overflow-x: hidden;"
+      >
+        <el-checkbox v-for="item in dimNoLookup" :key="item" :label="item" style="width:90%;"></el-checkbox>
+      </el-checkbox-group>
+      <el-button type="primary" @click="clearSelectingDim()">clear</el-button>
+    </div>
+    <!-- cards part -->
+    <div style="width:90%;margin-left:100px" class="card-box">
+      <div ref="chartDv" style="width: 100%;" id="card-container">
+        <el-row>
+          <el-col :span="8" v-for="(item,key) of plotingData" :key="key">
+            <chart-card
+              :drawingData="item"
+              :cncStation="key"
+              :alertStyle="alertList"
+              @showDetail="plotDetailView"
+            />
+          </el-col>
+        </el-row>
+      </div>
+    </div>
+
+    <!-- more detail view -->
     <el-row>
-      <el-col :span="3">
-        <h style="margin-bottom:8px">Dim No</h>
-        <el-checkbox-group
-          v-model="selectingDimNo"
-          class="dimNoCheckBox"
-          style="position:fixed;height:400px;overflow-y:scroll;overflow-x:hidden;margin-right:8px;margin-left:8px"
-        >
-          <el-checkbox v-for="item in dimNoLookup" :key="item" :label="item" style="width:90%;"></el-checkbox>
-        </el-checkbox-group>
-        <!-- <div style="position:fixed;">
-          <el-button type="primary">Clear Selected</el-button>
-        </div> -->
-      </el-col>
-      <el-col :span="21">
-        <div ref="chartDv" style="width: 100%;" id="card-container">
-          <el-row>
-            <el-col :span="8" v-for="(item,key) of plotingData" :key="key">
-              <chart-card :drawingData="item" :cncStation="key" :alertStyle="alertList" />
-            </el-col>
-          </el-row>
-        </div>
-      </el-col>
+      <detail-view
+        :cncStation="detailCncStation"
+        :drawingData="detailDrawingData"
+        :showChartDetails="showDetailView"
+        @closeDetail="closeDetailView"
+      />
     </el-row>
   </div>
 </template>
@@ -37,6 +55,7 @@
 import OptionBar from "../components/OptionBar.vue";
 import TitleOfProject from "../components/TItleOfProject.vue";
 import ChartCard from "./ChartCard.vue";
+import DetailView from "./DetailView.vue";
 import * as dvApi from "@/api/ei/dv";
 import echarts from "echarts";
 
@@ -45,7 +64,8 @@ export default {
   components: {
     OptionBar,
     TitleOfProject,
-    ChartCard
+    ChartCard,
+    DetailView
   },
   data() {
     return {
@@ -57,7 +77,10 @@ export default {
       plotingData: {},
       alertList: [],
       dimNoLookup: [],
-      selectingDimNo: []
+      selectingDimNo: [],
+      showDetailView: false,
+      detailCncStation: "",
+      detailDrawingData: []
     };
   },
   methods: {
@@ -85,6 +108,19 @@ export default {
           this.dimNoLookup.push(item.dim_no);
         }
       });
+    },
+    plotDetailView(data) {
+      // console.log("got emit with:" + data);
+      this.detailCncStation = data;
+      this.detailDrawingData = this.plotingData[data];
+      // console.log(this.detailDrawingData);
+      this.showDetailView = true;
+    },
+    closeDetailView() {
+      this.showDetailView = false;
+    },
+    clearSelectingDim() {
+      this.selectingDimNo = [];
     }
   },
   watch: {

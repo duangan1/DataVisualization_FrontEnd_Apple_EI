@@ -1,45 +1,86 @@
 <template>
-  <el-card :body-style="{padding:'0px'}" class="card-base" :class="alertStyle" style="border:1px solid #dfe6ec;margin-right: 8px;margin-top: 8px;">
-    <div slot="header" class="clearfix">
-      <span>{{cncStation}}</span>
-      <el-button
-        style="float: right; padding: 3px 0"
-        icon="el-icon-document"
-        type="text"
-        @click="setShowChartDetailsFlag()"
-      >More Details</el-button>
-    </div>
-    <div :id="cncStation+'-chart'" class="line-chart" style="height:370px;width:100%;left:0"></div>
-  </el-card>
+  <el-dialog
+    title="Chart Details"
+    :fullscreen="true"
+    :close-on-press-escape="false"
+    :visible.sync="showChartDetails"
+    :close-on-click-modal="false"
+    :modal="fale"
+    @close="closeDetail"
+  >
+    <el-row>
+      <el-col :span="14">
+        <el-card :body-style="{padding:'0px'}" style="width:100%">
+          <div slot="header" class="clearfix">
+            <span style="font-weight:bold;">{{cncStation}} Detail</span>
+          </div>
+          <div id="chartDetailArea" style="width:100%;height:700px"></div>
+        </el-card>
+      </el-col>
+      <el-col :span="10">
+        <el-card :body-style="{padding:'2px'}">
+          <div slot="header" class="clearfix">
+            <span style="font-weight:bold;">Risk Suggest</span>
+          </div>
+          <!-- <el-table
+            :data="riskSuggestTableData"
+            border
+            highlight-current-row
+            style="width: 100%"
+            max-height="800px"
+            @current-change="tableCurrentChange"
+          >
+            <el-table-column prop="ruleName" label="Rule Name" width="140" />
+            <el-table-column prop="caclResult" label="Level" width="150" />
+            <el-table-column prop="dimNos" label="Suggest Dim No." />
+            <el-table-column prop="chkDimNos" label="Check Dim No." />
+            <el-table-column label="Action" width="80">
+              <template slot-scope="scope">
+                <el-link
+                  type="primary"
+                  icon="el-icon-edit"
+                  @click="showChartRiskDetailEditDialog(scope.row)"
+                >Edit</el-link>
+              </template>
+            </el-table-column>
+          </el-table> -->
+        </el-card>
+      </el-col>
+    </el-row>
+  </el-dialog>
 </template>
 
 <script>
 import echarts from "echarts";
+
 export default {
-  name: "ChartCard",
+  name: "DetailView",
   props: {
     drawingData: {
       type: Array,
       required: true
     },
+    riskSuggestTableData: {
+      type: Object
+    },
     cncStation: {
       type: String,
       required: true
     },
-    alertStyle: {
-      type: Array,
-      required: true
+    showChartDetails:{
+      type: Boolean,
+      required: true,
     },
-    data() {
-      return {
-        
-      };
-    }
+  },
+  data() {
+    return {
+      chartAearDom:Object
+    };
   },
   methods: {
     initPlot() {
       // console.log(this.cncStation + "-chart");
-      let chartDv = document.getElementById(this.cncStation + "-chart");
+      let chartDv = document.getElementById("chartDetailArea");
       // console.log(chartDv);
       let chart = echarts.init(chartDv);
       const xPointNumber = [];
@@ -69,20 +110,19 @@ export default {
         sipTolMinusVal.push(Number(item.sipTolPlus));
       });
 
-        //determine dataZoom's end
+      //determine dataZoom's end
         let xAxisLen = xPointNumber.length;
         let zoomEnd = 10;
-        if(xAxisLen <= 15){
+        if(xAxisLen <= 30){
           zoomEnd = 100;
         }
-        else if(xAxisLen <= 30){
+        else if(xAxisLen <= 60){
           zoomEnd = 50;
         }
-        else if(xAxisLen <= 45){
+        else if(xAxisLen <= 90){
           zoomEnd = 20;
         }
 
-      // console.log(dev1Val);
       let option = {
         backgroundColor: "rgb(250,250,250)", //'#f3f3f3',
         title: {
@@ -141,8 +181,8 @@ export default {
         },
         xAxis: [
           {
-            // name:"Point Number",
-            show: false,
+            name:"Point Number",
+            show: true,
             type: "category",
             boundaryGap: false,
             data: xPointNumber
@@ -432,25 +472,24 @@ export default {
       chart.setOption(option);
       // console.log("options setted");
     },
-    setShowChartDetailsFlag() {
-      // console.log("emit showDatial")
-      this.$emit("showDetail",this.cncStation);
-    }
-  }, //methods
-  watch: {
-    drawingData: function(newval, oldval) {
-      this.initPlot();
+    tableCurrentChange(){},
+    closeDetail(){
+      this.$emit("closeDetail");
     }
   },
+  watch: {
+    showChartDetails: function(newval,oldval){
+      // console.log(this.drawingData);
+      setTimeout(() =>{
+        this.initPlot();
+      },0);
+    },
+    // drawingData: function(newval,oldval){
+    //   this.initPlot();
+    // }
+  },
   mounted() {
-    this.initPlot();
+    this.chartAearDom = document.getElementById("chartDetailArea");
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.card-base {
-  margin-right: 8px;
-  margin-top: 8px;
-}
-</style>
