@@ -1,6 +1,17 @@
 <template>
   <div class="app-container">
     <OptionBar ref="option" @dataChanged="updateData" chartType="line_chart" />
+    <!-- rule box -->
+    <div id="rule-box">
+      <el-checkbox-group
+      v-model="selectingRules"
+      >
+        <el-checkbox label="point_risk_level" :disabled="!rulesBoxShow"></el-checkbox>
+        <el-checkbox label="outlier_detection" :disabled="!rulesBoxShow"></el-checkbox>
+        <el-checkbox label="dispersion_detection" :disabled="!rulesBoxShow"></el-checkbox>
+        <el-checkbox label="deviation_detection" :disabled="!rulesBoxShow"></el-checkbox>
+      </el-checkbox-group>
+    </div>
     <title-of-project
       v-show="showVendorProjectTitle"
       :cellQualProjName="cellQual.projName"
@@ -9,7 +20,7 @@
     <!-- main view part -->
     <!-- dim select part -->
     <div
-      style="width:20%;position:fixed;overflow-x: hidden;overflow-y:scroll;"
+      style="width:5em;position:fixed;overflow-x: hidden;overflow-y:hidden;"
       class="dim-filter"
       v-show="showVendorProjectTitle"
     >
@@ -31,7 +42,7 @@
             <chart-card
               :drawingData="item"
               :cncStation="key"
-              :alertStyle="alertList"
+              :alertList="alertCncStation"
               @showDetail="plotDetailView"
             />
           </el-col>
@@ -45,6 +56,7 @@
         :cncStation="detailCncStation"
         :drawingData="detailDrawingData"
         :showChartDetails="showDetailView"
+        :rulesRiskData="rulesDataAll"
         @closeDetail="closeDetailView"
       />
     </el-row>
@@ -75,12 +87,17 @@ export default {
         vendorName: ""
       },
       plotingData: {},
-      alertList: [],
+      headerId: 0,
       dimNoLookup: [],
       selectingDimNo: [],
       showDetailView: false,
       detailCncStation: "",
-      detailDrawingData: []
+      detailDrawingData: [],
+      //filter rule risk 
+      rulesDataAll: {},
+      selectingRules: [],
+      alertCncStation: [],
+      rulesBoxShow: false,
     };
   },
   methods: {
@@ -99,7 +116,17 @@ export default {
       //   this.plotDataAll = option.totalData;
       // }
       this.plotingData = option.totalData;
+      this.headerId = option.selectingOption[0].cell_header_id;
       this.fillDimNoLookup();
+      dvApi.getLineChartRules(this.headerId).then(data => {
+        // console.log('got rules');
+        this.rulesDataAll = data;
+        // console.log(this.rulesDataAll);
+        this.rulesBoxShow = true;
+      })
+      .catch( error => {
+        alert("get rules failed");
+      })
     },
     fillDimNoLookup() {
       let oneData = this.plotingData[Object.keys(this.plotingData)[0]];
@@ -144,15 +171,42 @@ export default {
         this.plotingData = option.totalData;
       }
       // console.log(this.plotingData);
+    },
+    selectingRules: function(newval,oldval){
+      //新增选择
+      // console.log('selectingRules changing');
+      let rules = this.selectingRules;
+      let rulesDataAll = this.rulesDataAll;
+      this.alertCncStation = [];
+      rules.forEach(ruleItem => {
+        for (let riskLevelItemKey in rulesDataAll[ruleItem]){
+          for (let key in rulesDataAll[ruleItem][riskLevelItemKey]){
+            if(this.alertCncStation.indexOf(key) == -1){
+              this.alertCncStation.push(key);
+            }
+          }
+        }
+      });
+      //取消选择, 采用每次清空重新遍历的方式
     }
-  }
+  },
 };
 </script>
 
-<style lang="css" scoped>
+<style scoped>
 .dimNoCheckBox {
   display: fixed;
   height: 200px;
   overflow: scroll;
+}
+
+#rule-box {
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 4px;
+  border-color: rgba(128, 128, 128, 0.185);
+  padding: 2px;
+  width: 45em;
+  margin-top: 4px;
 }
 </style>

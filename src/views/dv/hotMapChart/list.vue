@@ -41,7 +41,8 @@ export default {
         projName: "",
         vendorName: ""
       },
-      plotDataAll: []
+      plotDataAll: [],
+      updateTime: "",
     };
   },
   // mounted() {
@@ -54,6 +55,7 @@ export default {
       let option = this.$refs.option;
       this.cellQual.projName = option.project;
       this.cellQual.vendorName = option.vendor;
+      this.updateTime = option.updateTime ;
       this.showVendorProjectTitle = true;
       //目前只筛选dimNo
       let dimNo = option.searchMoreConditions.dimNo;

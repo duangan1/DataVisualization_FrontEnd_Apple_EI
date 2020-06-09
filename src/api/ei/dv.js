@@ -112,3 +112,25 @@ export function getOptionLookup(){
     })
   })
 }
+
+export function getLineChartRules(header_id){
+  return new Promise((resolve,reject) => {
+    let _url = '/python_api/api_visual_linechart_rules/';
+    let mes = window.location;
+    let _baseurl = `//${mes.hostname}:${mes.port}`;
+    axios({
+      baseURL: _baseurl,
+      url: _url,
+      method: 'post',
+      data: {
+        header_id: header_id,
+      }
+    })
+    .then(response => {
+      resolve(response.data);
+    })
+    .catch(error => {
+      reject(error.data);
+    })
+  })
+}

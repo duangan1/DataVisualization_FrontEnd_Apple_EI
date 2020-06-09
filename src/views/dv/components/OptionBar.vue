@@ -316,7 +316,8 @@ export default {
       build: "",
       partNo: "",
       cncStation: "",
-      dataround: ""
+      dataround: "",
+      updateTime:"",
     };
   }, //template data
   mounted() {
@@ -347,34 +348,34 @@ export default {
     //   console.log('condition changedd');
     // },
     project: function(newval, oldval) {
-      console.log("project changed:" + this.project);
+      // console.log("project changed:" + this.project);
       this.doFiltOptionLookup();
-      console.log(this.selectingOption);
+      // console.log(this.selectingOption);
     },
     vendor: function(newval, oldval) {
-      console.log("vendor changed:" + this.vendor);
+      // console.log("vendor changed:" + this.vendor);
       this.doFiltOptionLookup();
-      console.log(this.selectingOption);
+      // console.log(this.selectingOption);
     },
     build: function(newval, oldval) {
-      console.log("build changed:" + this.build);
+      // console.log("build changed:" + this.build);
       this.doFiltOptionLookup();
-      console.log(this.selectingOption);
+      // console.log(this.selectingOption);
     },
     partNo: function(newval, oldval) {
-      console.log("partNo changed:" + this.partNo);
+      // console.log("partNo changed:" + this.partNo);
       this.doFiltOptionLookup();
-      console.log(this.selectingOption);
+      // console.log(this.selectingOption);
     },
     cncStation: function(newval, oldval) {
-      console.log("cncStation changed:" + this.cncStation);
+      // console.log("cncStation changed:" + this.cncStation);
       this.doFiltOptionLookup();
-      console.log(this.selectingOption);
+      // console.log(this.selectingOption);
     },
     dataround: function(newval, oldval) {
-      console.log("dataround changed:" + this.dataround);
+      // console.log("dataround changed:" + this.dataround);
       this.doFiltOptionLookup();
-      console.log(this.selectingOption);
+      // console.log(this.selectingOption);
     }
   },
   methods: {
@@ -591,8 +592,10 @@ export default {
         //判断是取 cell qual data 表，还是dim summary 表
         if (this.chartType == "hotmap") {
           header_id = this.selectingOption[0].dim_header_id;
+          this.updateTime = this.selectingOption[0].dim_created_at;
         } else {
           header_id = this.selectingOption[0].cell_header_id;
+          this.updateTime = this.selectingOption[0].cell_updated_at;
         }
       } else {
         //未能唯一确定header_id

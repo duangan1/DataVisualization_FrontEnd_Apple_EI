@@ -22,28 +22,11 @@
           <div slot="header" class="clearfix">
             <span style="font-weight:bold;">Risk Suggest</span>
           </div>
-          <!-- <el-table
-            :data="riskSuggestTableData"
-            border
-            highlight-current-row
-            style="width: 100%"
-            max-height="800px"
-            @current-change="tableCurrentChange"
-          >
-            <el-table-column prop="ruleName" label="Rule Name" width="140" />
-            <el-table-column prop="caclResult" label="Level" width="150" />
-            <el-table-column prop="dimNos" label="Suggest Dim No." />
-            <el-table-column prop="chkDimNos" label="Check Dim No." />
-            <el-table-column label="Action" width="80">
-              <template slot-scope="scope">
-                <el-link
-                  type="primary"
-                  icon="el-icon-edit"
-                  @click="showChartRiskDetailEditDialog(scope.row)"
-                >Edit</el-link>
-              </template>
-            </el-table-column>
-          </el-table> -->
+          <el-table :data="riskTableData" border style="width: 100%">
+            <el-table-column prop="ruleName" label="Rule Name" width="180"></el-table-column>
+            <el-table-column prop="level" label="Level" width="180"></el-table-column>
+            <el-table-column prop="dimPoint" label="DimNo-PointNum"></el-table-column>
+          </el-table>
         </el-card>
       </el-col>
     </el-row>
@@ -60,21 +43,23 @@ export default {
       type: Array,
       required: true
     },
-    riskSuggestTableData: {
-      type: Object
+    rulesRiskData: {
+      type: Object,
+      required: true
     },
     cncStation: {
       type: String,
       required: true
     },
-    showChartDetails:{
+    showChartDetails: {
       type: Boolean,
-      required: true,
-    },
+      required: true
+    }
   },
   data() {
     return {
-      chartAearDom:Object
+      chartAearDom: Object,
+      riskTableData: []
     };
   },
   methods: {
@@ -111,17 +96,15 @@ export default {
       });
 
       //determine dataZoom's end
-        let xAxisLen = xPointNumber.length;
-        let zoomEnd = 10;
-        if(xAxisLen <= 30){
-          zoomEnd = 100;
-        }
-        else if(xAxisLen <= 60){
-          zoomEnd = 50;
-        }
-        else if(xAxisLen <= 90){
-          zoomEnd = 20;
-        }
+      let xAxisLen = xPointNumber.length;
+      let zoomEnd = 10;
+      if (xAxisLen <= 30) {
+        zoomEnd = 100;
+      } else if (xAxisLen <= 60) {
+        zoomEnd = 50;
+      } else if (xAxisLen <= 90) {
+        zoomEnd = 20;
+      }
 
       let option = {
         backgroundColor: "rgb(250,250,250)", //'#f3f3f3',
@@ -165,8 +148,9 @@ export default {
             "SIP - TOL",
             "SIP + TOL"
           ],
+          top: "30px",
           right: "0",
-          show: false,
+          show: true,
           textStyle: {
             fontSize: 12,
             color: "#686b6f"
@@ -181,7 +165,7 @@ export default {
         },
         xAxis: [
           {
-            name:"Point Number",
+            name: "Point Number",
             show: true,
             type: "category",
             boundaryGap: false,
@@ -472,18 +456,35 @@ export default {
       chart.setOption(option);
       // console.log("options setted");
     },
-    tableCurrentChange(){},
-    closeDetail(){
+    tableCurrentChange() {},
+    closeDetail() {
       this.$emit("closeDetail");
+    },
+    formatTableData() {
+      this.riskTableData = [];
+      let dataAll = this.rulesRiskData;
+      for (let ruleNameKey in dataAll) {
+        for (let levelKey in dataAll[ruleNameKey]) {
+          if(levelKey == 'NaN'){
+            break;
+          }
+          if(dataAll[ruleNameKey][levelKey][this.cncStation]){
+            dataAll[ruleNameKey][levelKey][this.cncStation].forEach(pointItem => {
+            this.riskTableData.push({ruleName:ruleNameKey, level:levelKey, dimPoint:pointItem.dim_no + "-" + pointItem.point_num});
+          });
+          }
+        }
+      }
     }
   },
   watch: {
-    showChartDetails: function(newval,oldval){
+    showChartDetails: function(newval, oldval) {
       // console.log(this.drawingData);
-      setTimeout(() =>{
+      setTimeout(() => {
         this.initPlot();
-      },0);
-    },
+        this.formatTableData();
+      }, 0);
+    }
     // drawingData: function(newval,oldval){
     //   this.initPlot();
     // }

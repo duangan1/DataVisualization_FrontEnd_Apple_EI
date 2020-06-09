@@ -1,5 +1,8 @@
 <template>
-  <el-card :body-style="{padding:'0px'}" class="card-base" :class="alertStyle" style="border:1px solid #dfe6ec;margin-right: 8px;margin-top: 8px;">
+  <el-card
+    :body-style="{padding:'0px'}"
+    :class="{'card-base':baseStyle,'card-alert':alertStyle}"
+  >
     <div slot="header" class="clearfix">
       <span>{{cncStation}}</span>
       <el-button
@@ -26,16 +29,17 @@ export default {
       type: String,
       required: true
     },
-    alertStyle: {
+    alertList: {
       type: Array,
       required: true
     },
-    data() {
-      return {
-        
-      };
-    }
   },
+  data() {
+      return {
+        baseStyle: true,
+        alertStyle: false,
+      };
+    },
   methods: {
     initPlot() {
       // console.log(this.cncStation + "-chart");
@@ -69,18 +73,16 @@ export default {
         sipTolMinusVal.push(Number(item.sipTolPlus));
       });
 
-        //determine dataZoom's end
-        let xAxisLen = xPointNumber.length;
-        let zoomEnd = 10;
-        if(xAxisLen <= 15){
-          zoomEnd = 100;
-        }
-        else if(xAxisLen <= 30){
-          zoomEnd = 50;
-        }
-        else if(xAxisLen <= 45){
-          zoomEnd = 20;
-        }
+      //determine dataZoom's end
+      let xAxisLen = xPointNumber.length;
+      let zoomEnd = 10;
+      if (xAxisLen <= 15) {
+        zoomEnd = 100;
+      } else if (xAxisLen <= 30) {
+        zoomEnd = 50;
+      } else if (xAxisLen <= 45) {
+        zoomEnd = 20;
+      }
 
       // console.log(dev1Val);
       let option = {
@@ -434,12 +436,20 @@ export default {
     },
     setShowChartDetailsFlag() {
       // console.log("emit showDatial")
-      this.$emit("showDetail",this.cncStation);
+      this.$emit("showDetail", this.cncStation);
     }
   }, //methods
   watch: {
     drawingData: function(newval, oldval) {
       this.initPlot();
+    },
+    alertList: function(newval, oldval) {
+      if (newval.indexOf(this.cncStation) != -1) {
+        this.alertStyle = true;
+        // console.log(this.cncStation + ": alert");
+      } else {
+        this.alertStyle = false;
+      }
     }
   },
   mounted() {
@@ -448,9 +458,12 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .card-base {
   margin-right: 8px;
   margin-top: 8px;
+}
+.card-alert {
+  border: 1px solid red !important;
 }
 </style>
