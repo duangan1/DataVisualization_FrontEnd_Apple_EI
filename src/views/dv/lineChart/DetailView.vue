@@ -469,9 +469,18 @@ export default {
             break;
           }
           if(dataAll[ruleNameKey][levelKey][this.cncStation]){
+            let dimPointListString = '';
+            let cnt = 1;
             dataAll[ruleNameKey][levelKey][this.cncStation].forEach(pointItem => {
-            this.riskTableData.push({ruleName:ruleNameKey, level:levelKey, dimPoint:pointItem.dim_no + "-" + pointItem.point_num});
+            if(cnt == 1){
+              dimPointListString = dimPointListString + '' + pointItem.dim_no + "-" + pointItem.point_num;
+            }
+            else{
+              dimPointListString = dimPointListString + ', ' + pointItem.dim_no + "-" + pointItem.point_num;
+            }
+            cnt += 1;
           });
+            this.riskTableData.push({ruleName:ruleNameKey, level:levelKey, dimPoint:dimPointListString});
           }
         }
       }
