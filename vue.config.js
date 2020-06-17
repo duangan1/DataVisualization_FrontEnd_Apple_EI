@@ -86,6 +86,14 @@ module.exports = {
           '^/python_api/api_visual_linechart_rules/': '/python_api/api_visual_linechart_rules/'
          }
       },
+      '/python_api/api_visual_line_chart_debug/':{
+        target: 'http://120.26.177.17:5500', // 接口的域名
+        // secure: false,  // 如果是https接口，需要配置这个参数
+        changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
+        pathRewrite: {
+          '^/python_api/api_visual_line_chart_debug/': '/python_api/api_visual_line_chart_debug/'
+         }
+      },
     },
   },
   configureWebpack: {

@@ -13,6 +13,7 @@
         <el-card :body-style="{padding:'0px'}" style="width:100%">
           <div slot="header" class="clearfix">
             <span style="font-weight:bold;">{{cncStation}} Detail</span>
+            <span :style="{color:debugColor}" style="margin-left:2em;font-size:20px;">{{debugText}}</span>
           </div>
           <div id="chartDetailArea" style="width:100%;height:700px"></div>
         </el-card>
@@ -54,12 +55,18 @@ export default {
     showChartDetails: {
       type: Boolean,
       required: true
+    },
+    debugList: {
+      type: Array,
+      required: true
     }
   },
   data() {
     return {
       chartAearDom: Object,
-      riskTableData: []
+      riskTableData: [],
+      debugText: '',
+      debugColor:'',
     };
   },
   methods: {
@@ -493,10 +500,20 @@ export default {
         this.initPlot();
         this.formatTableData();
       }, 0);
+    },
+    debugList: function(newval, oldval) {
+      newval.forEach(item => {
+        if (item.cnc_no == this.cncStation) {
+          this.debugText = item.calc_debug_judgement;
+          if (this.debugText == "alert") {
+            this.debugColor = 'rgba(255, 0, 0, 0.527)'
+          }
+          if (this.debugText == "debug") {
+            this.debugColor = 'rgba(255, 255, 0, 0.719)'
+          }
+        }
+      });
     }
-    // drawingData: function(newval,oldval){
-    //   this.initPlot();
-    // }
   },
   mounted() {
     this.chartAearDom = document.getElementById("chartDetailArea");

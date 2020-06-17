@@ -43,6 +43,7 @@
               :drawingData="item"
               :cncStation="key"
               :alertList="alertCncStation"
+              :debugList="debugDataAll"
               @showDetail="plotDetailView"
             />
           </el-col>
@@ -57,6 +58,7 @@
         :drawingData="detailDrawingData"
         :showChartDetails="showDetailView"
         :rulesRiskData="rulesDataAll"
+        :debugList="debugDataAll"
         @closeDetail="closeDetailView"
       />
     </el-row>
@@ -70,6 +72,7 @@ import ChartCard from "./ChartCard.vue";
 import DetailView from "./DetailView.vue";
 import * as dvApi from "@/api/ei/dv";
 import echarts from "echarts";
+import { Message } from 'element-ui'
 
 export default {
   name: "lineChart",
@@ -98,6 +101,8 @@ export default {
       selectingRules: [],
       alertCncStation: [],
       rulesBoxShow: false,
+      //debug result
+      debugDataAll: [],
     };
   },
   methods: {
@@ -118,14 +123,54 @@ export default {
       this.plotingData = option.totalData;
       this.headerId = option.selectingOption[0].cell_header_id;
       this.fillDimNoLookup();
+      //get rules
       dvApi.getLineChartRules(this.headerId).then(data => {
         // console.log('got rules');
         this.rulesDataAll = data;
         // console.log(this.rulesDataAll);
         this.rulesBoxShow = true;
+        Message({
+          showClose: true,
+          message: 'load rules judgement successfully',
+          type: 'success',
+          duration: 3000,
+        });
       })
       .catch( error => {
-        alert("get rules failed");
+        Message({
+          showClose: true,
+          message: 'load rules judgement failed: '+ error,
+          type: 'error',
+          duration: 3000,
+        });
+      })
+      //get debug
+      dvApi.getLineChartDebug(this.headerId).then(data => {
+        if(typeof(data) == 'string' ){
+          Message({
+            showClose: true,
+            message: data,
+            type: 'warning',
+            duration: 3000,
+          })
+        }
+        else{
+          this.debugDataAll = data;
+          Message({
+            showClose: true,
+            message: 'Load Debug info successfully',
+            type: 'success',
+            duration: 3000,
+          })
+        }
+      })
+      .catch(error => {
+        Message({
+          showClose: true,
+          message: 'Load debug judgement failed: '+ error,
+          type: 'error',
+          duration: 3000,
+        })
       })
     },
     fillDimNoLookup() {
@@ -148,6 +193,16 @@ export default {
     },
     clearSelectingDim() {
       this.selectingDimNo = [];
+    },
+    getDebugResult(cncNo){
+      res = '';
+      this.debugDataAll.forEach(item => {
+        if(item.cnc_no == cncNo){
+          res = item.calc_debug_judgement
+        }
+      });
+      console.log(res);
+      return res;
     }
   },
   watch: {
