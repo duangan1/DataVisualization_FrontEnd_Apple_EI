@@ -1,49 +1,71 @@
 <template>
-  <el-card
-    :body-style="{padding:'0px'}"
-    :class="{'card-base':baseStyle,'card-alert':alertStyle}"
+  <el-dialog
+    title="Chart Details"
+    :fullscreen="true"
+    :close-on-press-escape="false"
+    :visible.sync="showChartDetails"
+    :close-on-click-modal="false"
+    :modal="fale"
+    @close="closeDetail"
   >
-    <div slot="header" class="clearfix">
-      <span>{{cncStation}}</span>
-      <el-button
-        style="float: right; padding: 3px 0"
-        icon="el-icon-document"
-        type="text"
-        @click="setShowChartDetailsFlag()"
-      >More Details</el-button>
-    </div>
-    <div :id="cncStation+'-chart'" class="line-chart" style="height:370px;width:100%;left:0"></div>
-  </el-card>
+    <el-row>
+      <el-col :span="14">
+        <el-card :body-style="{padding:'0px'}" style="width:100%">
+          <div slot="header" class="clearfix">
+            <span style="font-weight:bold;">{{cncStation}} Detail</span>
+          </div>
+          <div id="chartDetailArea" style="width:100%;height:700px"></div>
+        </el-card>
+      </el-col>
+      <el-col :span="10">
+        <el-card :body-style="{padding:'2px'}">
+          <div slot="header" class="clearfix">
+            <span style="font-weight:bold;">Risk Suggest</span>
+          </div>
+          <el-table :data="riskTableData" border style="width: 100%">
+            <el-table-column prop="ruleName" label="Rule Name" width="180"></el-table-column>
+            <el-table-column prop="level" label="Level" width="180"></el-table-column>
+            <el-table-column prop="dimPoint" label="DimNo-PointNum"></el-table-column>
+          </el-table>
+        </el-card>
+      </el-col>
+    </el-row>
+  </el-dialog>
 </template>
 
 <script>
 import echarts from "echarts";
+
 export default {
-  name: "ChartCard",
+  name: "DetailView",
   props: {
     drawingData: {
       type: Array,
+      required: true
+    },
+    rulesRiskData: {
+      type: Object,
       required: true
     },
     cncStation: {
       type: String,
       required: true
     },
-    alertList: {
-      type: Array,
+    showChartDetails: {
+      type: Boolean,
       required: true
-    },
+    }
   },
   data() {
-      return {
-        baseStyle: true,
-        alertStyle: false,
-      };
-    },
+    return {
+      chartAearDom: Object,
+      riskTableData: []
+    };
+  },
   methods: {
     initPlot() {
       // console.log(this.cncStation + "-chart");
-      let chartDv = document.getElementById(this.cncStation + "-chart");
+      let chartDv = document.getElementById("chartDetailArea");
       // console.log(chartDv);
       let chart = echarts.init(chartDv);
       const xPointNumber = [];
@@ -76,15 +98,14 @@ export default {
       //determine dataZoom's end
       let xAxisLen = xPointNumber.length;
       let zoomEnd = 10;
-      if (xAxisLen <= 15) {
+      if (xAxisLen <= 30) {
         zoomEnd = 100;
-      } else if (xAxisLen <= 30) {
+      } else if (xAxisLen <= 60) {
         zoomEnd = 50;
-      } else if (xAxisLen <= 45) {
+      } else if (xAxisLen <= 90) {
         zoomEnd = 20;
       }
 
-      // console.log(dev1Val);
       let option = {
         backgroundColor: "rgb(250,250,250)", //'#f3f3f3',
         title: {
@@ -127,8 +148,9 @@ export default {
             "SIP - TOL",
             "SIP + TOL"
           ],
+          top: "30px",
           right: "0",
-          show: false,
+          show: true,
           textStyle: {
             fontSize: 12,
             color: "#686b6f"
@@ -143,8 +165,8 @@ export default {
         },
         xAxis: [
           {
-            // name:"Point Number",
-            show: false,
+            name: "Point Number",
+            show: true,
             type: "category",
             boundaryGap: false,
             data: xPointNumber
@@ -434,36 +456,41 @@ export default {
       chart.setOption(option);
       // console.log("options setted");
     },
-    setShowChartDetailsFlag() {
-      // console.log("emit showDatial")
-      this.$emit("showDetail", this.cncStation);
-    }
-  }, //methods
-  watch: {
-    drawingData: function(newval, oldval) {
-      this.initPlot();
+    tableCurrentChange() {},
+    closeDetail() {
+      this.$emit("closeDetail");
     },
-    alertList: function(newval, oldval) {
-      if (newval.indexOf(this.cncStation) != -1) {
-        this.alertStyle = true;
-        // console.log(this.cncStation + ": alert");
-      } else {
-        this.alertStyle = false;
+    formatTableData() {
+      this.riskTableData = [];
+      let dataAll = this.rulesRiskData;
+      for (let ruleNameKey in dataAll) {
+        for (let levelKey in dataAll[ruleNameKey]) {
+          if(levelKey == 'NaN'){
+            break;
+          }
+          if(dataAll[ruleNameKey][levelKey][this.cncStation]){
+            dataAll[ruleNameKey][levelKey][this.cncStation].forEach(pointItem => {
+            this.riskTableData.push({ruleName:ruleNameKey, level:levelKey, dimPoint:pointItem.dim_no + "-" + pointItem.point_num});
+          });
+          }
+        }
       }
     }
   },
+  watch: {
+    showChartDetails: function(newval, oldval) {
+      // console.log(this.drawingData);
+      setTimeout(() => {
+        this.initPlot();
+        this.formatTableData();
+      }, 0);
+    }
+    // drawingData: function(newval,oldval){
+    //   this.initPlot();
+    // }
+  },
   mounted() {
-    this.initPlot();
+    this.chartAearDom = document.getElementById("chartDetailArea");
   }
 };
 </script>
-
-<style scoped>
-.card-base {
-  margin-right: 8px;
-  margin-top: 8px;
-}
-.card-alert {
-  border: 1px solid red !important;
-}
-</style>

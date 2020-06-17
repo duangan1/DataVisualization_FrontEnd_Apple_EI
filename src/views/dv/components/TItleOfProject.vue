@@ -23,6 +23,9 @@ export default {
             type: String,
             require: true
         },
+        cellQualDate: {
+          type: String
+        },
         // chartType:{
         //   type: String,
         //   required: true,
