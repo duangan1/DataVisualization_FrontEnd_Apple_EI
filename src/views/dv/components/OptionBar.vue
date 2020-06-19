@@ -118,9 +118,9 @@
               >
                 <el-option
                   v-for="item in spcCheckListLookup"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
+                  :key="item"
+                  :label="item"
+                  :value="item"
                 />
               </el-select>
             </el-form-item>
@@ -195,12 +195,7 @@
                 multiple
                 clearable
               >
-                <el-option
-                  v-for="item in faiNoLookup"
-                  :key="item.label"
-                  :label="item.label"
-                  :value="item.label"
-                />
+                <el-option v-for="item in faiNoLookup" :key="item" :label="item" :value="item" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -253,9 +248,9 @@ const initSearchMoreConditions = {
   cncMachineNo: [],
   faiNo: [],
   dimNo: [],
-  projectedYieldFrom: "",
-  projectedYieldTo: "",
-  spcCheckList: [],
+  projectedYieldFrom: 0,
+  projectedYieldTo: 100,
+  spcCheckList: "",
   cutters: [],
   engDbHeaderId: ""
 };
@@ -310,6 +305,7 @@ export default {
       faiNoLookup: [],
       dimNoLookup: [],
       cutterNoLookup: [],
+      spcCheckListLookup:['yes','no'],
       //把searchConditions对象拆开来以方便watch
       project: "",
       vendor: "",
@@ -317,7 +313,7 @@ export default {
       partNo: "",
       cncStation: "",
       dataround: "",
-      updateTime:"",
+      updateTime: ""
     };
   }, //template data
   mounted() {
@@ -528,7 +524,7 @@ export default {
         url_type = "heat_map";
       } else if (this.chartType == "histogram") {
         url_type = "bar_graph";
-      } else if(this.chartType == "line_chart"){
+      } else if (this.chartType == "line_chart") {
         url_type = "linechart";
       }
       // console.log("test");
@@ -621,9 +617,10 @@ export default {
               }
             )
               .then(() => {
-                this.popDataChangedEvent();
+                this.popDataChangedEvent('S');
               })
               .catch(() => {
+                this.popDataChangedEvent('S');
                 this.popupMoreSearch();
               });
           })
@@ -631,8 +628,7 @@ export default {
             //暂时用alert
             alert(error);
           });
-      }
-      else{
+      } else {
         alert("no data suitable for these option yet");
       }
     },
@@ -655,244 +651,29 @@ export default {
       // test data, only fill up dimNoLookup
       let data = this.totalData;
       // console.log(data);
-      for (var item of data) {
-        if (this.chartType == "boxplot" && this.dimNoLookup.indexOf(item["dim_no"])==-1) {
-          this.dimNoLookup.push(item["dim_no"]);
-        } else if (this.chartType == "histogram") {
-          this.dimNoLookup.push(item.dim_no);
+      if (this.chartType == "line_chart") {
+        for (let cnckey in data) {
+          for (let dataItem of data[cnckey]) {
+            if (this.faiNoLookup.indexOf(dataItem.faiNo) == -1) {
+              this.faiNoLookup.push(dataItem.faiNo);
+            }
+          }
+        }
+      } else {
+        for (var item of data) {
+          if (
+            this.chartType == "boxplot" &&
+            this.dimNoLookup.indexOf(item["dim_no"]) == -1
+          ) {
+            this.dimNoLookup.push(item["dim_no"]);
+          } else if (this.chartType == "histogram") {
+            this.dimNoLookup.push(item.dim_no);
+          }
         }
       }
+
       // this.dimNoLookup.push('BM_1');
     }
-
-    //下面是师兄原来写的，暂时不用
-    // //Search button handler
-    // handleSearch() {
-    //   this.handleFilter();
-    //   this.loadData();
-    // },
-    // //format searchConditions
-    // handleFilter() {
-    //   this.filter = "";
-    //   if (this.searchConditions.title !== "") {
-    //     this.filter =
-    //       this.filter + ",t.title CONTAIN " + this.searchConditions.title;
-    //   }
-    //   if (this.searchConditions.project !== "") {
-    //     this.filter = this.filter + ",t.projectId EQ " + this.searchConditions;
-    //   }
-
-    //   if (this.searchConditions.vendor !== "") {
-    //     this.filter =
-    //       this.filter + ",t.vendorId EQ " + this.searchConditions.vendor;
-    //   }
-
-    //   if (this.searchConditions.build !== "") {
-    //     this.filter =
-    //       this.filter + ",t.build EQ " + this.searchConditions.build;
-    //   }
-
-    //   if (this.searchConditions.partNo !== "") {
-    //     this.filter =
-    //       this.filter + ",t.partNo CONTAIN " + this.searchConditions.partNo;
-    //   }
-
-    //   if (this.searchConditions.dataround !== "") {
-    //     this.filter =
-    //       this.filter + ",t.dataRound EQ " + this.searchConditions.dataround;
-    //   }
-
-    //   if (this.searchConditions.cncStation !== "") {
-    //     this.filter =
-    //       this.filter +
-    //       ",t.cncSatation EQ " +
-    //       this.searchConditions.cncSatation;
-    //   }
-    // },
-    // // request data
-    // loadData() {
-    //   // debugger
-    //   this.processLoading = true;
-    //   this.currentRow = { status: "" };
-    //   cellQualDataApi
-    //     .select({
-    //       currentPage: this.currentPage,
-    //       limit: this.limit,
-    //       filter: this.filter
-    //     })
-    //     .then(response => {
-    //       this.tableData = response.data.items;
-    //       this.totalCount = response.data.totalCount;
-
-    //       this.processLoading = false;
-
-    //       if (this.totalCount == 1) {
-    //         this.uniqueHeader = true;
-    //         this.disableCaclRulesArea = false;
-    //         this.cellQualHeaderId = response.data.items[0].headerId;
-    //         this.cellQualCNCStation = response.data.items[0].cncSatation;
-    //         this.cellQualVendorName = response.data.items[0].vendor;
-    //         this.cellQualProjName = response.data.items[0].project;
-    //         this.cellQualDate = response.data.items[0].updatedAt;
-
-    //         MessageBox.confirm(
-    //           "Do you want to Show Charts or Open the more conditions select window?",
-    //           i18n.t("core.tips"),
-    //           {
-    //             showClose: false,
-    //             confirmButtonText: "Show",
-    //             cancelButtonText: "Select More",
-    //             type: "info",
-    //             dangerouslyUseHTMLString: true
-    //           }
-    //         )
-    //           .then(() => {
-    //             //重置查询条件
-    //             this.searchMoreConditions = { ...initSearchMoreConditions };
-    //             // this.handleMoreSelectionFilter();
-    //             this.initMoreSelectionFilter =
-    //               ",t.headerId EQ " + this.cellQualHeaderId;
-    //             //获取machine
-    //             this.fetchCellQualMetric("cnc_machine");
-    //             this.moreSelectionFilter =
-    //               ",dc.headerId EQ " + this.cellQualHeaderId;
-    //             //draw line charts
-    //             //**组件化后这里要改变
-    //             setTimeout(() => {
-    //               this.fetchChartData("S");
-    //             }, 1000);
-    //           })
-    //           .catch(() => {
-    //             this.popupMoreSearch();
-    //           });
-    //       } else {
-    //         messageUtils.showsErrorMessage(
-    //           i18n.tc("dv.line.mutlipleRecsFound")
-    //         );
-    //         this.uniqueHeader = false;
-    //         //** project title 显示要改 */
-    //         // this.showVendorProjectTitle = false;
-    //         this.disableCaclRulesArea = false;
-    //       }
-    //     })
-    //     .catch(() => {
-    //       this.processLoading = false;
-    //     });
-    // },
-    // //fetch chart data
-    // //**要根据不同图修改
-    // fetchChartData(operationType) {
-    //   //**交给父组件去处理title显示
-    //   // this.showVendorProjectTitle = true;
-    //   this.processLoading = true;
-    //   //operationType S - from Search Button  SM - from Search More button
-    //   if ("SM" == operationType) {
-    //     if (this.searchMoreConditions.cncMachineNo.length !== 0) {
-    //       this.cncMachineNoList = this.searchMoreConditions.cncMachineNo;
-    //     } else {
-    //       this.setAllMachineNoList();
-    //     }
-    //   } else if ("S" == operationType) {
-    //     this.setAllMachineNoList();
-    //   }
-
-    //   dvApi
-    //     .initLineChartData(this.getQueryParameter({}))
-    //     .then(response => {
-    //       if (response.code == "20000") {
-    //         const renderChartList = [];
-    //         this.cncMachineNoList.forEach(machine => {
-    //           // console.log("machine:" + machine);
-    //           const machineChartData = response.data[`${machine}`];
-    //           if (machineChartData) {
-    //             renderChartList.push({
-    //               key: machine,
-    //               val: machine,
-    //               class: "line-chart-container-default"
-    //             });
-    //             machineChartData.forEach(mcdi => {
-    //               // console.log(mcdi.faiNo + " / " + mcdi.dev1);
-    //             });
-    //           }
-    //         });
-    //         // // render chart areas
-    //         // this.dynamicChartList = renderChartList;
-    //         // this.searchRulesCondition.cellQualCols = [];
-    //         // // init chart
-    //         // this.cncMachineNoList.forEach(machine => {
-    //         //   this.processLoading = false;
-    //         //   // console.log("machine:" + machine);
-    //         //   const machineChartData = response.data[`${machine}`];
-    //         //   if (machineChartData) {
-    //         //     setTimeout(() => {
-    //         //       this.initChart(machine, machineChartData, this);
-    //         //     }, 1000);
-    //         //   }
-    //         // });
-    //         this.showMoreSelectionPopup = false;
-    //       } else {
-    //         this.processLoading = false;
-    //       }
-    //     })
-    //     .catch(() => {
-    //       this.processLoading = false;
-    //     });
-    // },
-    // fetchCellQualMetric(name) {
-    //   dvApi
-    //     .initLineChartMoreSelectOption(
-    //       { currentPage: 1, limit: 1000, filter: this.initMoreSelectionFilter },
-    //       name
-    //     )
-    //     .then(response => {
-    //       if ("cnc_machine" == name) {
-    //         this.cncMachineNoLookup = response.data.items;
-    //       } else if ("fai_no" == name) {
-    //         this.faiNoLookup = response.data.items;
-    //       } else if ("dim_no" == name) {
-    //         this.dimNoLookup = response.data.items;
-    //       } else if ("cutter_no" == name) {
-    //         this.cutterNoLookup = response.data.items;
-    //         if (this.cutterNoLookup.length > 0) {
-    //           this.searchMoreConditions.engDbHeaderId =
-    //             response.data.items[0].value;
-    //         }
-    //       } else if ("risk_suggest_detail_dim_no" == name) {
-    //         this.riskDetailDimNoLookup = response.data.items;
-    //       }
-    //     });
-    // },
-    // popupMoreSearch() {
-    //   if (this.uniqueHeader) {
-    //     this.showMoreSelectionPopup = true;
-    //     //加载与上次不一样的cellqualdata headerid，重新加载
-    //     // debugger
-    //     if (this.cellQualHeaderId !== this.moreSelectionHeaderId) {
-    //       this.moreSelectionHeaderId = this.cellQualHeaderId;
-    //       //重置查询条件
-    //       this.searchMoreConditions = { ...initSearchMoreConditions };
-    //       // this.handleMoreSelectionFilter();
-    //       this.initMoreSelectionFilter =  ",t.headerId EQ " + this.cellQualHeaderId;
-    //       //加载弹出框参数
-    //       this.fetchCellQualMetric("cnc_machine");
-    //       this.fetchCellQualMetric("fai_no");
-    //       this.fetchCellQualMetric("dim_no");
-    //       this.fetchCellQualMetric("cutter_no");
-    //       this.$refs.moreSelectionForm.resetFields();
-    //     }
-    //   } else {
-    //     this.showMoreSelectionPopup = false;
-    //     messageUtils.showsErrorMessage(i18n.tc('dv.line.mutlipleRecsFound'));
-    //   }
-    // },
-    // //fet
-    // setAllMachineNoList(){
-    //     this.cncMachineNoList = [];
-    //     this.cncMachineNoLookup.forEach(item =>{
-    //       // console.log('item.value:'+item.value);
-    //        this.cncMachineNoList.push(item.value);
-    //     })
-    // }
   } //methods
 };
 </script>

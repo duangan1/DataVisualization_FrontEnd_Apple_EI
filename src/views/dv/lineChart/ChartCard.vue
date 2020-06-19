@@ -12,7 +12,7 @@
         type="text"
         @click="setShowChartDetailsFlag()"
       >More Details</el-button>
-      <span :style="{color:debugColor}" style="margin-left:2em;font-size:20px;">{{debugText}}</span>
+      <span :style="{color:debugColor}" style="margin-left:2em;font-size:20px;font-weight:bold;">{{debugText}}</span>
     </div>
     <div :id="cncStation+'-chart'" class="line-chart" style="height:370px;width:100%;left:0"></div>
   </el-card>
@@ -465,11 +465,11 @@ export default {
     debugList: function(newval, oldval) {
       newval.forEach(item => {
         if (item.cnc_no == this.cncStation) {
-          this.debugText = item.calc_debug_judgement;
-          if (this.debugText == "alert") {
+          this.debugText = item.calc_debug_judgement.replace(/^\S/, s => s.toUpperCase());
+          if (this.debugText == "Alert") {
             this.debugColor = 'rgba(255, 0, 0, 0.527)'
           }
-          if (this.debugText == "debug") {
+          if (this.debugText == "Debug") {
             this.debugColor = 'rgba(255, 255, 0, 0.719)'
           }
         }

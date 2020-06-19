@@ -13,22 +13,41 @@
         <el-card :body-style="{padding:'0px'}" style="width:100%">
           <div slot="header" class="clearfix">
             <span style="font-weight:bold;">{{cncStation}} Detail</span>
-            <span :style="{color:debugColor}" style="margin-left:2em;font-size:20px;">{{debugText}}</span>
           </div>
           <div id="chartDetailArea" style="width:100%;height:700px"></div>
         </el-card>
       </el-col>
       <el-col :span="10">
-        <el-card :body-style="{padding:'2px'}">
-          <div slot="header" class="clearfix">
-            <span style="font-weight:bold;">Risk Suggest</span>
-          </div>
-          <el-table :data="riskTableData" border style="width: 100%">
-            <el-table-column prop="ruleName" label="Rule Name" width="180"></el-table-column>
-            <el-table-column prop="level" label="Level" width="180"></el-table-column>
-            <el-table-column prop="dimPoint" label="DimNo-PointNum"></el-table-column>
-          </el-table>
-        </el-card>
+        <el-row>
+          <el-col :span="24">
+            <el-card :body-style="{padding:'2px'}">
+              <div slot="header" class="clearfix">
+                <span style="font-weight:bold;">Machine Fine Tune</span>
+              </div>
+              <el-table :data="debugTableData" border style="width: 100%">
+                <el-table-column prop="cp" label="Cp"></el-table-column>
+                <el-table-column prop="meanDrift" label="Mean-Drift"></el-table-column>
+                <el-table-column prop="cpVal" label="Cp-val"></el-table-column>
+                <el-table-column prop="meanDriftVal" label="M-D-val"></el-table-column>
+                <el-table-column prop="judgement" label="judgement"></el-table-column>
+              </el-table>
+            </el-card>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-card :body-style="{padding:'2px'}">
+              <div slot="header" class="clearfix">
+                <span style="font-weight:bold;">Risk Suggest</span>
+              </div>
+              <el-table :data="riskTableData" border style="width: 100%">
+                <el-table-column prop="ruleName" label="Rule Name" ></el-table-column>
+                <el-table-column prop="level" label="Level" ></el-table-column>
+                <el-table-column prop="dimPoint" label="DimNo-PointNum"></el-table-column>
+              </el-table>
+            </el-card>
+          </el-col>
+        </el-row>
       </el-col>
     </el-row>
   </el-dialog>
@@ -56,8 +75,8 @@ export default {
       type: Boolean,
       required: true
     },
-    debugList: {
-      type: Array,
+    debugItem: {
+      type: Object,
       required: true
     }
   },
@@ -65,8 +84,9 @@ export default {
     return {
       chartAearDom: Object,
       riskTableData: [],
-      debugText: '',
-      debugColor:'',
+      debugTableData: [],
+      debugText: "",
+      debugColor: ""
     };
   },
   methods: {
@@ -468,29 +488,56 @@ export default {
       this.$emit("closeDetail");
     },
     formatTableData() {
+      //risk table
       this.riskTableData = [];
       let dataAll = this.rulesRiskData;
       for (let ruleNameKey in dataAll) {
         for (let levelKey in dataAll[ruleNameKey]) {
-          if(levelKey == 'NaN'){
+          if (levelKey == "NaN") {
             break;
           }
-          if(dataAll[ruleNameKey][levelKey][this.cncStation]){
-            let dimPointListString = '';
+          if (dataAll[ruleNameKey][levelKey][this.cncStation]) {
+            let dimPointListString = "";
             let cnt = 1;
-            dataAll[ruleNameKey][levelKey][this.cncStation].forEach(pointItem => {
-            if(cnt == 1){
-              dimPointListString = dimPointListString + '' + pointItem.dim_no + "-" + pointItem.point_num;
-            }
-            else{
-              dimPointListString = dimPointListString + ', ' + pointItem.dim_no + "-" + pointItem.point_num;
-            }
-            cnt += 1;
-          });
-            this.riskTableData.push({ruleName:ruleNameKey, level:levelKey, dimPoint:dimPointListString});
+            dataAll[ruleNameKey][levelKey][this.cncStation].forEach(
+              pointItem => {
+                if (cnt == 1) {
+                  dimPointListString =
+                    dimPointListString +
+                    "" +
+                    pointItem.dim_no +
+                    "-" +
+                    pointItem.point_num;
+                } else {
+                  dimPointListString =
+                    dimPointListString +
+                    ", " +
+                    pointItem.dim_no +
+                    "-" +
+                    pointItem.point_num;
+                }
+                cnt += 1;
+              }
+            );
+            this.riskTableData.push({
+              ruleName: ruleNameKey,
+              level: levelKey,
+              dimPoint: dimPointListString
+            });
           }
         }
       }
+
+      //debug table
+      this.debugTableData = [];
+      let debugData = this.debugItem;
+      this.debugTableData.push({
+        cp: debugData.cp,
+        meanDrift: debugData.mean_drift,
+        cpVal: debugData.cp_val,
+        meanDriftVal: debugData.mean_drift_val,
+        judgement: debugData.calc_debug_judgement
+      });
     }
   },
   watch: {
@@ -500,20 +547,20 @@ export default {
         this.initPlot();
         this.formatTableData();
       }, 0);
-    },
-    debugList: function(newval, oldval) {
-      newval.forEach(item => {
-        if (item.cnc_no == this.cncStation) {
-          this.debugText = item.calc_debug_judgement;
-          if (this.debugText == "alert") {
-            this.debugColor = 'rgba(255, 0, 0, 0.527)'
-          }
-          if (this.debugText == "debug") {
-            this.debugColor = 'rgba(255, 255, 0, 0.719)'
-          }
-        }
-      });
     }
+    // debugList: function(newval, oldval) {
+    //   newval.forEach(item => {
+    //     if (item.cnc_no == this.cncStation) {
+    //       this.debugText = item.calc_debug_judgement;
+    //       if (this.debugText == "alert") {
+    //         this.debugColor = 'rgba(255, 0, 0, 0.527)'
+    //       }
+    //       if (this.debugText == "debug") {
+    //         this.debugColor = 'rgba(255, 255, 0, 0.719)'
+    //       }
+    //     }
+    //   });
+    // }
   },
   mounted() {
     this.chartAearDom = document.getElementById("chartDetailArea");

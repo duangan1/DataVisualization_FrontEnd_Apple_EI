@@ -3,9 +3,7 @@
     <OptionBar ref="option" @dataChanged="updateData" chartType="line_chart" />
     <!-- rule box -->
     <div id="rule-box">
-      <el-checkbox-group
-      v-model="selectingRules"
-      >
+      <el-checkbox-group v-model="selectingRules">
         <el-checkbox label="point_risk_level" :disabled="!rulesBoxShow"></el-checkbox>
         <el-checkbox label="outlier_detection" :disabled="!rulesBoxShow"></el-checkbox>
         <el-checkbox label="dispersion_detection" :disabled="!rulesBoxShow"></el-checkbox>
@@ -58,7 +56,7 @@
         :drawingData="detailDrawingData"
         :showChartDetails="showDetailView"
         :rulesRiskData="rulesDataAll"
-        :debugList="debugDataAll"
+        :debugItem="detailViewDebugItem"
         @closeDetail="closeDetailView"
       />
     </el-row>
@@ -72,7 +70,7 @@ import ChartCard from "./ChartCard.vue";
 import DetailView from "./DetailView.vue";
 import * as dvApi from "@/api/ei/dv";
 import echarts from "echarts";
-import { Message } from 'element-ui'
+import { Message } from "element-ui";
 
 export default {
   name: "lineChart",
@@ -96,84 +94,130 @@ export default {
       showDetailView: false,
       detailCncStation: "",
       detailDrawingData: [],
-      //filter rule risk 
+      //filter rule risk
       rulesDataAll: {},
       selectingRules: [],
       alertCncStation: [],
       rulesBoxShow: false,
       //debug result
       debugDataAll: [],
+      detailViewDebugItem: {},
     };
   },
   methods: {
     updateData(param) {
       let option = this.$refs.option;
-      this.cellQual.projName = option.project;
-      this.cellQual.vendorName = option.vendor;
-      this.showVendorProjectTitle = true;
-      //目前只筛选dimNo
-      // let dimNo = option.searchMoreConditions.dimNo;
-      // if (dimNo != 0) {
-      //   this.plotDataAll = option.totalData.filter(function(item) {
-      //     return !(dimNo.indexOf(item['dim-point']) == -1);
-      //   });
-      // } else {
-      //   this.plotDataAll = option.totalData;
-      // }
-      this.plotingData = option.totalData;
-      this.headerId = option.selectingOption[0].cell_header_id;
-      this.fillDimNoLookup();
-      //get rules
-      dvApi.getLineChartRules(this.headerId).then(data => {
-        // console.log('got rules');
-        this.rulesDataAll = data;
-        // console.log(this.rulesDataAll);
-        this.rulesBoxShow = true;
-        Message({
-          showClose: true,
-          message: 'load rules judgement successfully',
-          type: 'success',
-          duration: 3000,
+      this.plotingData = {};
+      if (param == "SM") {
+        //筛选良率,fai or nor,
+        let yieldFrom = option.searchMoreConditions.projectedYieldFrom / 100;
+        let yieldTo = option.searchMoreConditions.projectedYieldTo / 100;
+        let faiOrNot = option.searchMoreConditions.spcCheckList;
+        let faiFilterList = option.searchMoreConditions.faiNo;
+        Object.keys(option.totalData).forEach(key => {
+          let temp = [];
+          //FAI No筛选
+          if (faiFilterList.length != 0) {
+            temp = option.totalData[key].filter(function(item) {
+                return faiFilterList.indexOf(item.faiNo) != -1;
+              })
+          }
+          else{
+            temp = option.totalData[key];
+          }
+          //良率范围筛选
+          if (!(yieldFrom == 0 && yieldTo == 1)) {
+            temp = temp.filter(dataItem => {
+              return (
+                dataItem.projected_yields >= yieldFrom &&
+                dataItem.projected_yields <= yieldTo
+              );
+            })
+          }
+          //Fai or Not 筛选
+          if(!(faiOrNot == "")){
+            if(faiOrNot == "yes"){
+              temp = temp.filter(dataItem => {
+                return !(dataItem.faiNo == "");
+              })
+            } else{
+              temp = temp.filter(dataItem => {
+                return (dataItem.faiNo == "");
+              })
+            }
+          }
+
+          //筛选后赋值给plotingdata
+          this.$set(this.plotingData,
+          key,
+          temp);
         });
-      })
-      .catch( error => {
-        Message({
-          showClose: true,
-          message: 'load rules judgement failed: '+ error,
-          type: 'error',
-          duration: 3000,
-        });
-      })
-      //get debug
-      dvApi.getLineChartDebug(this.headerId).then(data => {
-        if(typeof(data) == 'string' ){
-          Message({
-            showClose: true,
-            message: data,
-            type: 'warning',
-            duration: 3000,
+        this.fillDimNoLookup();
+      }
+
+      if (param == "S") {
+        this.plotingData = option.totalData;
+        this.cellQual.projName = option.project;
+        this.cellQual.vendorName = option.vendor;
+        this.showVendorProjectTitle = true;
+        this.headerId = option.selectingOption[0].cell_header_id;
+        this.fillDimNoLookup();
+        //get rules
+        dvApi
+          .getLineChartRules(this.headerId)
+          .then(data => {
+            // console.log('got rules');
+            this.rulesDataAll = data;
+            // console.log(this.rulesDataAll);
+            this.rulesBoxShow = true;
+            Message({
+              showClose: true,
+              message: "load rules judgement successfully",
+              type: "success",
+              duration: 3000
+            });
           })
-        }
-        else{
-          this.debugDataAll = data;
-          Message({
-            showClose: true,
-            message: 'Load Debug info successfully',
-            type: 'success',
-            duration: 3000,
+          .catch(error => {
+            Message({
+              showClose: true,
+              message: "load rules judgement failed: " + error,
+              type: "error",
+              duration: 3000
+            });
+          });
+        //get debug
+        dvApi
+          .getLineChartDebug(this.headerId)
+          .then(data => {
+            if (typeof data == "string") {
+              Message({
+                showClose: true,
+                message: data,
+                type: "warning",
+                duration: 3000
+              });
+            } else {
+              this.debugDataAll = data;
+              Message({
+                showClose: true,
+                message: "Load Debug info successfully",
+                type: "success",
+                duration: 3000
+              });
+            }
           })
-        }
-      })
-      .catch(error => {
-        Message({
-          showClose: true,
-          message: 'Load debug judgement failed: '+ error,
-          type: 'error',
-          duration: 3000,
-        })
-      })
+          .catch(error => {
+            Message({
+              showClose: true,
+              message: "Load debug judgement failed: " + error,
+              type: "error",
+              duration: 3000
+            });
+          });
+      }
     },
     fillDimNoLookup() {
+      this.dimNoLookup = [];
       let oneData = this.plotingData[Object.keys(this.plotingData)[0]];
       oneData.forEach(item => {
         if (this.dimNoLookup.indexOf(item.dim_no) == -1) {
@@ -185,6 +229,11 @@ export default {
       // console.log("got emit with:" + data);
       this.detailCncStation = data;
       this.detailDrawingData = this.plotingData[data];
+      // console.log(this.debugDataAll);
+      this.detailViewDebugItem = this.debugDataAll.filter(item => {
+        return item.cnc_no == data;
+      })[0];
+      // console.log(this.detailViewDebugItem);
       // console.log(this.detailDrawingData);
       this.showDetailView = true;
     },
@@ -194,11 +243,11 @@ export default {
     clearSelectingDim() {
       this.selectingDimNo = [];
     },
-    getDebugResult(cncNo){
-      res = '';
+    getDebugResult(cncNo) {
+      res = "";
       this.debugDataAll.forEach(item => {
-        if(item.cnc_no == cncNo){
-          res = item.calc_debug_judgement
+        if (item.cnc_no == cncNo) {
+          res = item.calc_debug_judgement;
         }
       });
       console.log(res);
@@ -211,6 +260,7 @@ export default {
       let option = this.$refs.option;
       if (this.selectingDimNo.length != 0) {
         // console.log('不空');
+        let temp = this.plotingData;
         this.plotingData = {};
         Object.keys(option.totalData).forEach(key => {
           // console.log(key);
@@ -223,20 +273,30 @@ export default {
           );
         });
       } else {
-        this.plotingData = option.totalData;
+        //判断多选窗口是否有选择
+        let yieldFrom = option.searchMoreConditions.projectedYieldFrom / 100;
+        let yieldTo = option.searchMoreConditions.projectedYieldTo / 100;
+        let faiOrNot = option.searchMoreConditions.spcCheckList;
+        let faiFilterList = option.searchMoreConditions.faiNo;
+        if(((faiFilterList.length != 0)) || (!(yieldFrom == 0 && yieldTo == 1)) || !(faiOrNot == "")){
+          this.plotingData = temp;
+        }
+        else{
+          this.plotingData = option.totalData;
+        }
       }
       // console.log(this.plotingData);
     },
-    selectingRules: function(newval,oldval){
+    selectingRules: function(newval, oldval) {
       //新增选择
       // console.log('selectingRules changing');
       let rules = this.selectingRules;
       let rulesDataAll = this.rulesDataAll;
       this.alertCncStation = [];
       rules.forEach(ruleItem => {
-        for (let riskLevelItemKey in rulesDataAll[ruleItem]){
-          for (let key in rulesDataAll[ruleItem][riskLevelItemKey]){
-            if(this.alertCncStation.indexOf(key) == -1){
+        for (let riskLevelItemKey in rulesDataAll[ruleItem]) {
+          for (let key in rulesDataAll[ruleItem][riskLevelItemKey]) {
+            if (this.alertCncStation.indexOf(key) == -1) {
               this.alertCncStation.push(key);
             }
           }
@@ -244,7 +304,7 @@ export default {
       });
       //取消选择, 采用每次清空重新遍历的方式
     }
-  },
+  }
 };
 </script>
 
