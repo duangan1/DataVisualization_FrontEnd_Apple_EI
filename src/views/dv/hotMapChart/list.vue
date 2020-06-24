@@ -5,7 +5,7 @@
       v-show="showVendorProjectTitle"
       :cellQualProjName="cellQual.projName"
       :cellQualVendorName="cellQual.vendorName"
-    > Risk Level Hotmap </title-of-project>
+    > Hotmap </title-of-project>
     <el-row v-if="show"> 
       <el-col :span="6"><p class="ruleName">Rules:</p></el-col>
       <el-col :span="18">
@@ -146,6 +146,10 @@ export default {
       } else {
         this.plotDataAll = option.totalData;
       }
+      if (this.plotDataAll.hasOwnProperty("msg")){
+          alert(this.plotDataAll.msg)
+      }
+      
     },
     formatPlotData() {},
 
