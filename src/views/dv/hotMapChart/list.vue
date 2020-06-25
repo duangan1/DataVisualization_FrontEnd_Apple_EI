@@ -5,6 +5,7 @@
       v-show="showVendorProjectTitle"
       :cellQualProjName="cellQual.projName"
       :cellQualVendorName="cellQual.vendorName"
+      :cellQualDate="updateDate"
     > Hotmap </title-of-project>
     <el-row v-if="show"> 
       <el-col :span="6"><p class="ruleName">Rules:</p></el-col>
@@ -123,7 +124,8 @@ export default {
       plotDataAll: [],
       radio: "dim_risk_level",
       show: false,
-      showRuleData: []
+      showRuleData: [],
+      updateDate: "",
     };
   },
   // mounted() {
@@ -136,6 +138,7 @@ export default {
       let option = this.$refs.option;
       this.cellQual.projName = option.project;
       this.cellQual.vendorName = option.vendor;
+      this.updateDate = option.selectingOption[0].dim_updated_at;
       this.showVendorProjectTitle = true;
       //目前只筛选dimNo
       let dimNo = option.searchMoreConditions.dimNo;

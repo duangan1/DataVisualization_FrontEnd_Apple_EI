@@ -8,7 +8,7 @@
       v-show="showVendorProjectTitle"
       :cellQualProjName="cellQual.projName"
       :cellQualVendorName="cellQual.vendorName"
-      
+      :cellQualDate="updateDate"
     > Projected Yields </title-of-project>
     <div ref="chartDv" style="width: 100%;height: 600px"></div>
   </div>
@@ -34,7 +34,8 @@ export default {
         projName: "",
         vendorName: ""
       },
-      plotDataAll: []
+      plotDataAll: [],
+      updateDate: "",
     };
   },
   // mounted() {
@@ -47,6 +48,7 @@ export default {
       let option = this.$refs.option;
       this.cellQual.projName = option.project;
       this.cellQual.vendorName = option.vendor;
+      this.updateDate = option.selectingOption[0].cell_updated_at;
       this.showVendorProjectTitle = true;
       //目前只筛选dimNo
       let dimNo = option.searchMoreConditions.dimNo;
