@@ -1,6 +1,9 @@
 <template>
   <div class="app-container">
-    <OptionBar ref="option" @dataChanged="updateData" chartType="line_chart" />
+    <OptionBar 
+    ref="option"
+    @dataChanged="updateData" 
+    chartType="line_chart" />
     <!-- rule box -->
     <div id="rule-box">
       <el-checkbox-group v-model="selectingRules">
@@ -14,6 +17,7 @@
       v-show="showVendorProjectTitle"
       :cellQualProjName="cellQual.projName"
       :cellQualVendorName="cellQual.vendorName"
+      :cellQualDate="updateDate"
     >Deviation LineChart</title-of-project>
     <!-- main view part -->
     <!-- dim select part -->
@@ -87,6 +91,7 @@ export default {
         projName: "",
         vendorName: ""
       },
+      updateDate: "",
       plotingData: {},
       headerId: 0,
       dimNoLookup: [],
@@ -101,7 +106,7 @@ export default {
       rulesBoxShow: false,
       //debug result
       debugDataAll: [],
-      detailViewDebugItem: {},
+      detailViewDebugItem: {}
     };
   },
   methods: {
@@ -110,47 +115,12 @@ export default {
       this.plotingData = {};
       if (param == "SM") {
         //筛选良率,fai or nor,
-        let yieldFrom = option.searchMoreConditions.projectedYieldFrom / 100;
-        let yieldTo = option.searchMoreConditions.projectedYieldTo / 100;
-        let faiOrNot = option.searchMoreConditions.spcCheckList;
-        let faiFilterList = option.searchMoreConditions.faiNo;
+        this.plotingData = {};
         Object.keys(option.totalData).forEach(key => {
-          let temp = [];
-          //FAI No筛选
-          if (faiFilterList.length != 0) {
-            temp = option.totalData[key].filter(function(item) {
-                return faiFilterList.indexOf(item.faiNo) != -1;
-              })
-          }
-          else{
-            temp = option.totalData[key];
-          }
-          //良率范围筛选
-          if (!(yieldFrom == 0 && yieldTo == 1)) {
-            temp = temp.filter(dataItem => {
-              return (
-                dataItem.projected_yields >= yieldFrom &&
-                dataItem.projected_yields <= yieldTo
-              );
-            })
-          }
-          //Fai or Not 筛选
-          if(!(faiOrNot == "")){
-            if(faiOrNot == "yes"){
-              temp = temp.filter(dataItem => {
-                return !(dataItem.faiNo == "");
-              })
-            } else{
-              temp = temp.filter(dataItem => {
-                return (dataItem.faiNo == "");
-              })
-            }
-          }
-
-          //筛选后赋值给plotingdata
-          this.$set(this.plotingData,
-          key,
-          temp);
+          // do select more, then select dim
+          let temp = option.totalData[key];
+          temp = this.doSelectMore(temp);
+          this.$set(this.plotingData, key, temp);
         });
         this.fillDimNoLookup();
       }
@@ -161,6 +131,7 @@ export default {
         this.cellQual.vendorName = option.vendor;
         this.showVendorProjectTitle = true;
         this.headerId = option.selectingOption[0].cell_header_id;
+        this.updateDate = option.selectingOption[0].cell_updated_at;
         this.fillDimNoLookup();
         //get rules
         dvApi
@@ -243,15 +214,41 @@ export default {
     clearSelectingDim() {
       this.selectingDimNo = [];
     },
-    getDebugResult(cncNo) {
-      res = "";
-      this.debugDataAll.forEach(item => {
-        if (item.cnc_no == cncNo) {
-          res = item.calc_debug_judgement;
+    doSelectMore(oneItem) {
+      let temp = oneItem;
+      let option = this.$refs.option;
+      let yieldFrom = option.searchMoreConditions.projectedYieldFrom / 100;
+      let yieldTo = option.searchMoreConditions.projectedYieldTo / 100;
+      let faiOrNot = option.searchMoreConditions.spcCheckList;
+      let faiFilterList = option.searchMoreConditions.faiNo;
+      //FAI No筛选
+      if (faiFilterList.length != 0) {
+        temp = temp.filter(function(item) {
+          return faiFilterList.indexOf(item.faiNo) != -1;
+        });
+      }
+      //良率范围筛选
+      if (!(yieldFrom == 0 && yieldTo == 1)) {
+        temp = temp.filter(dataItem => {
+          return (
+            dataItem.projected_yields >= yieldFrom &&
+            dataItem.projected_yields <= yieldTo
+          );
+        });
+      }
+      //Fai or Not 筛选
+      if (!(faiOrNot == "")) {
+        if (faiOrNot == "yes") {
+          temp = temp.filter(dataItem => {
+            return !(dataItem.faiNo == "");
+          });
+        } else {
+          temp = temp.filter(dataItem => {
+            return dataItem.faiNo == "";
+          });
         }
-      });
-      console.log(res);
-      return res;
+      }
+      return temp;
     }
   },
   watch: {
@@ -260,30 +257,28 @@ export default {
       let option = this.$refs.option;
       if (this.selectingDimNo.length != 0) {
         // console.log('不空');
-        let temp = this.plotingData;
         this.plotingData = {};
         Object.keys(option.totalData).forEach(key => {
-          // console.log(key);
+          // do select more, then select dim
+          let temp = option.totalData[key];
+          temp = this.doSelectMore(temp);
           this.$set(
             this.plotingData,
             key,
-            option.totalData[key].filter(function(item) {
+            temp.filter(function(item) {
               return !(newval.indexOf(item.dim_no) == -1);
             })
           );
         });
       } else {
-        //判断多选窗口是否有选择
-        let yieldFrom = option.searchMoreConditions.projectedYieldFrom / 100;
-        let yieldTo = option.searchMoreConditions.projectedYieldTo / 100;
-        let faiOrNot = option.searchMoreConditions.spcCheckList;
-        let faiFilterList = option.searchMoreConditions.faiNo;
-        if(((faiFilterList.length != 0)) || (!(yieldFrom == 0 && yieldTo == 1)) || !(faiOrNot == "")){
-          this.plotingData = temp;
-        }
-        else{
-          this.plotingData = option.totalData;
-        }
+        //only do select more
+        this.plotingData = {};
+        Object.keys(option.totalData).forEach(key => {
+          // console.log(key);
+          let temp = option.totalData[key];
+          temp = this.doSelectMore(temp);
+          this.$set(this.plotingData, key, temp);
+        });
       }
       // console.log(this.plotingData);
     },
