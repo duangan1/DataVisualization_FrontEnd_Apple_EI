@@ -8,6 +8,7 @@
     :modal="fale"
     @close="closeDetail"
   >
+    <!-- chart card -->
     <el-row>
       <el-col :span="14">
         <el-card :body-style="{padding:'0px'}" style="width:100%">
@@ -17,19 +18,106 @@
           <div id="chartDetailArea" style="width:100%;height:700px"></div>
         </el-card>
       </el-col>
+      <!-- info part -->
       <el-col :span="10">
-        <el-card :body-style="{padding:'2px'}">
-          <div slot="header" class="clearfix">
-            <span style="font-weight:bold;">Risk Suggest</span>
-          </div>
-          <el-table :data="riskTableData" border style="width: 100%">
-            <el-table-column prop="ruleName" label="Rule Name" width="180"></el-table-column>
-            <el-table-column prop="level" label="Level" width="180"></el-table-column>
-            <el-table-column prop="dimPoint" label="DimNo-PointNum"></el-table-column>
-          </el-table>
-        </el-card>
+        <!-- machine tune card -->
+        <el-row>
+          <el-col :span="24">
+            <el-card :body-style="{padding:'2px'}">
+              <div slot="header" class="clearfix">
+                <span style="font-weight:bold;">Machine Fine Tune</span>
+                <el-button
+                  type="text"
+                  style="float: right;padding: 3px 0"
+                  @click="popMachineFineTuneDialog()"
+                >New Record</el-button>
+              </div>
+              <el-table :data="debugTableData" border style="width: 100%">
+                <el-table-column prop="cp" label="Cp"></el-table-column>
+                <el-table-column prop="meanDrift" label="Mean-Drift"></el-table-column>
+                <el-table-column prop="cpVal" label="Cp-val"></el-table-column>
+                <el-table-column prop="meanDriftVal" label="M-D-val"></el-table-column>
+                <el-table-column prop="judgement" label="judgement"></el-table-column>
+              </el-table>
+            </el-card>
+          </el-col>
+        </el-row>
+        <!-- Risk Suggest Card -->
+        <el-row>
+          <el-col :span="24">
+            <el-card :body-style="{padding:'2px'}">
+              <div slot="header" class="clearfix">
+                <span style="font-weight:bold;">Risk Suggest</span>
+                <el-button
+                  type="text"
+                  style="float: right;padding: 3px 0"
+                  @click="popRiskSuggestDialog()"
+                >New Record</el-button>
+              </div>
+              <el-table :data="riskTableData" border style="width: 100%">
+                <el-table-column prop="ruleName" label="Rule Name"></el-table-column>
+                <el-table-column prop="level" label="Level"></el-table-column>
+                <el-table-column prop="dimPoint" label="DimNo-PointNum"></el-table-column>
+              </el-table>
+            </el-card>
+          </el-col>
+        </el-row>
       </el-col>
     </el-row>
+
+    <el-dialog
+    title="New Risk Record"
+    :fullscreen="false"
+    :modal="false"
+    :visible.sync="showRiskInput"
+    style="right:0px;"
+    >
+      <el-row :gutter="20">
+        <el-col :span="8">
+          <el-input v-model="riskInput.ruleName" placeholder="Rule Name"></el-input>
+        </el-col>
+        <el-col :span="8">
+          <el-input v-model="riskInput.level" placeholder="Level"></el-input>
+        </el-col>
+        <el-col :span="8">
+          <el-input v-model="riskInput.dimPoint" placeholder="DimNo-PointNum"></el-input>
+        </el-col>
+      </el-row>
+      <div slot="footer" class="dialog-footer">
+        <el-button style="right:8px" @click="closeRiskSuggestDialog()">Cancel</el-button>
+        <el-button type="primary" style="right:0px;" @click="submitRiskSuggest()">Submit</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog
+    title="New Machine Fine Tune"
+    :fullscreen="false"
+    :modal="false"
+    :visible.sync="showMachineFineTuneInput"
+    style="right:0px;"
+    >
+      <el-row :gutter="20">
+        <el-col :span="4">
+          <el-input v-model="machineFineTuneInput.cp" placeholder="Cp"></el-input>
+        </el-col>
+        <el-col :span="5">
+          <el-input v-model="machineFineTuneInput.meanDrift" placeholder="Mean Drift"></el-input>
+        </el-col>
+        <el-col :span="5">
+          <el-input v-model="machineFineTuneInput.cpVal" placeholder="Cp-Val"></el-input>
+        </el-col>
+        <el-col :span="5">
+          <el-input v-model="machineFineTuneInput.meanDriftVal" placeholder="M-D-Val"></el-input>
+        </el-col>
+        <el-col :span="5">
+          <el-input v-model="machineFineTuneInput.judgement" placeholder="Judgement"></el-input>
+        </el-col>
+      </el-row>
+      <div slot="footer" class="dialog-footer">
+        <el-button style="right:8px" @click="closeMachineFineTuneDialog()">Cancel</el-button>
+        <el-button type="primary" style="right:0px;" @click="submitMachineFineTune()">Submit</el-button>
+      </div>
+    </el-dialog>
   </el-dialog>
 </template>
 
@@ -54,12 +142,34 @@ export default {
     showChartDetails: {
       type: Boolean,
       required: true
+    },
+    debugItem: {
+      type: Object,
+      required: true
     }
   },
   data() {
     return {
       chartAearDom: Object,
-      riskTableData: []
+      riskTableData: [],
+      debugTableData: [],
+      debugText: "",
+      debugColor: "",
+      showRiskInput: false,
+      showMachineFineTuneInput: false,
+      showFineTuneInput: false,
+      riskInput: {
+        ruleName: '',
+        level:'',
+        dimPoint:''
+      },
+      machineFineTuneInput: {
+        cp: '',
+        meanDrift: '',
+        cpVal: '',
+        meanDriftVal: '',
+        judgement: ''
+      }
     };
   },
   methods: {
@@ -461,20 +571,76 @@ export default {
       this.$emit("closeDetail");
     },
     formatTableData() {
+      //risk table
       this.riskTableData = [];
       let dataAll = this.rulesRiskData;
       for (let ruleNameKey in dataAll) {
         for (let levelKey in dataAll[ruleNameKey]) {
-          if(levelKey == 'NaN'){
+          if (levelKey == "NaN") {
             break;
           }
-          if(dataAll[ruleNameKey][levelKey][this.cncStation]){
-            dataAll[ruleNameKey][levelKey][this.cncStation].forEach(pointItem => {
-            this.riskTableData.push({ruleName:ruleNameKey, level:levelKey, dimPoint:pointItem.dim_no + "-" + pointItem.point_num});
-          });
+          if (dataAll[ruleNameKey][levelKey][this.cncStation]) {
+            let dimPointListString = "";
+            let cnt = 1;
+            dataAll[ruleNameKey][levelKey][this.cncStation].forEach(
+              pointItem => {
+                if (cnt == 1) {
+                  dimPointListString =
+                    dimPointListString +
+                    "" +
+                    pointItem.dim_no +
+                    "-" +
+                    pointItem.point_num;
+                } else {
+                  dimPointListString =
+                    dimPointListString +
+                    ", " +
+                    pointItem.dim_no +
+                    "-" +
+                    pointItem.point_num;
+                }
+                cnt += 1;
+              }
+            );
+            this.riskTableData.push({
+              ruleName: ruleNameKey,
+              level: levelKey,
+              dimPoint: dimPointListString
+            });
           }
         }
       }
+
+      //debug table
+      this.debugTableData = [];
+      let debugData = this.debugItem;
+      if (this.debugItem) {
+        this.debugTableData.push({
+          cp: debugData.cp,
+          meanDrift: debugData.mean_drift,
+          cpVal: debugData.cp_val,
+          meanDriftVal: debugData.mean_drift_val,
+          judgement: debugData.calc_debug_judgement
+        });
+      }
+    },
+    popRiskSuggestDialog() {
+      this.showRiskInput = true;
+    },
+    popMachineFineTuneDialog() {
+      this.showMachineFineTuneInput = true;
+    },
+    closeRiskSuggestDialog() {
+      this.showRiskInput = false;
+    },
+    closeMachineFineTuneDialog() {
+      this.showMachineFineTuneInput = false;
+    },
+    submitRiskSuggest() {
+      //提交人为判断的 risk suggest 表单
+    },
+    submitMachineFineTune() {
+      //提交人为判断的Machine Fine Tune表单
     }
   },
   watch: {
@@ -485,8 +651,18 @@ export default {
         this.formatTableData();
       }, 0);
     }
-    // drawingData: function(newval,oldval){
-    //   this.initPlot();
+    // debugList: function(newval, oldval) {
+    //   newval.forEach(item => {
+    //     if (item.cnc_no == this.cncStation) {
+    //       this.debugText = item.calc_debug_judgement;
+    //       if (this.debugText == "alert") {
+    //         this.debugColor = 'rgba(255, 0, 0, 0.527)'
+    //       }
+    //       if (this.debugText == "debug") {
+    //         this.debugColor = 'rgba(255, 255, 0, 0.719)'
+    //       }
+    //     }
+    //   });
     // }
   },
   mounted() {

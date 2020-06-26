@@ -71,7 +71,7 @@ export function testData_json() {
   return testData;
 }
 
-export function getPlotDataByHeaderIdAndType(header_id,chart_type) {
+export function getPlotDataByHeaderIdAndType(header_id, chart_type) {
   return new Promise((resolve, reject) => {
     let _url = '/python_api/api_visual_';
     let mes = window.location;
@@ -94,8 +94,8 @@ export function getPlotDataByHeaderIdAndType(header_id,chart_type) {
   // return data_json;
 }
 
-export function getOptionLookup(){
-  return new Promise((resolve,reject) => {
+export function getOptionLookup() {
+  return new Promise((resolve, reject) => {
     let mes = window.location;
     let _baseurl = `//${mes.hostname}:${mes.port}`;
     axios({
@@ -103,18 +103,18 @@ export function getOptionLookup(){
       url: '/python_api/get_header_id/',
       method: 'get',
     })
-    .then(res => {
-      // console.log(res.data);
-      resolve(res.data);
-    })
-    .catch(err => {
-      reject(err.data);
-    })
+      .then(res => {
+        // console.log(res.data);
+        resolve(res.data);
+      })
+      .catch(err => {
+        reject(err.data);
+      })
   })
 }
 
-export function getLineChartRules(header_id){
-  return new Promise((resolve,reject) => {
+export function getLineChartRules(header_id) {
+  return new Promise((resolve, reject) => {
     let _url = '/python_api/api_visual_linechart_rules/';
     let mes = window.location;
     let _baseurl = `//${mes.hostname}:${mes.port}`;
@@ -126,11 +126,33 @@ export function getLineChartRules(header_id){
         header_id: header_id,
       }
     })
-    .then(response => {
-      resolve(response.data);
+      .then(response => {
+        resolve(response.data);
+      })
+      .catch(error => {
+        reject(error.data);
+      })
+  })
+}
+
+export function getLineChartDebug(header_id) {
+  return new Promise((resolve, reject) => {
+    let _url = '/python_api/api_visual_line_chart_debug/';
+    let mes = window.location;
+    let _baseurl = `//${mes.hostname}:${mes.port}`;
+    axios({
+      baseURL: _baseurl,
+      url: _url,
+      method: 'post',
+      data: {
+        header_id: header_id,
+      }
     })
-    .catch(error => {
-      reject(error.data);
-    })
+      .then(response => {
+        resolve(response.data);
+      })
+      .catch(error => {
+        reject(error.data);
+      })
   })
 }

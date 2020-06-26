@@ -2,6 +2,7 @@
   <el-card
     :body-style="{padding:'0px'}"
     :class="{'card-base':baseStyle,'card-alert':alertStyle}"
+    :ref="cncStation"
   >
     <div slot="header" class="clearfix">
       <span>{{cncStation}}</span>
@@ -11,6 +12,7 @@
         type="text"
         @click="setShowChartDetailsFlag()"
       >More Details</el-button>
+      <span :style="{color:debugColor}" style="margin-left:2em;font-size:20px;font-weight:bold;">{{debugText}}</span>
     </div>
     <div :id="cncStation+'-chart'" class="line-chart" style="height:370px;width:100%;left:0"></div>
   </el-card>
@@ -18,6 +20,9 @@
 
 <script>
 import echarts from "echarts";
+let header_background_color = '';
+const alert_background_color = 'rgba(255, 0, 0, 0.527)';
+const debug_background_color = 'rgba(255, 255, 0, 0.719)';
 export default {
   name: "ChartCard",
   props: {
@@ -33,13 +38,19 @@ export default {
       type: Array,
       required: true
     },
+    debugList: {
+      type: Array,
+      required: true
+    }
   },
   data() {
-      return {
-        baseStyle: true,
-        alertStyle: false,
-      };
-    },
+    return {
+      baseStyle: true,
+      alertStyle: false,
+      debugText: "",
+      debugColor: '',
+    };
+  },
   methods: {
     initPlot() {
       // console.log(this.cncStation + "-chart");
@@ -450,6 +461,19 @@ export default {
       } else {
         this.alertStyle = false;
       }
+    },
+    debugList: function(newval, oldval) {
+      newval.forEach(item => {
+        if (item.cnc_no == this.cncStation) {
+          this.debugText = item.calc_debug_judgement.replace(/^\S/, s => s.toUpperCase());
+          if (this.debugText == "Alert") {
+            this.debugColor = 'rgba(255, 0, 0, 0.527)'
+          }
+          if (this.debugText == "Debug") {
+            this.debugColor = 'rgba(255, 255, 0, 0.719)'
+          }
+        }
+      });
     }
   },
   mounted() {
@@ -458,7 +482,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .card-base {
   margin-right: 8px;
   margin-top: 8px;
