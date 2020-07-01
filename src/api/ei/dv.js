@@ -156,3 +156,23 @@ export function getLineChartDebug(header_id) {
       })
   })
 }
+
+export function postCustomParam(paramData) {
+  return new Promise((resolve, reject) => {
+    let _url = '/python_api/param/';
+    let mes = window.location;
+    let _baseurl = `//${mes.hostname}:${mes.port}`;
+    axios({
+      baseURL: _baseurl,
+      url: _url,
+      method: 'post',
+      data: paramData
+    })
+      .then(response => {
+        resolve(response.data);
+      })
+      .catch(error => {
+        reject(error.data);
+      })
+  })
+}
