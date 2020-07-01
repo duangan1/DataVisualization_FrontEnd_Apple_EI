@@ -176,3 +176,67 @@ export function postCustomParam(paramData) {
       })
   })
 }
+
+export function doRuleCalculate(type, paramData){
+  return new Promise((resolve, reject) => {
+    let _url = '/python_api/api_rule_' + type + '/';
+    let mes = window.location;
+    let _baseurl = `//${mes.hostname}:${mes.port}`;
+    axios({
+      baseURL: _baseurl,
+      url: _url,
+      method: 'post',
+      data: paramData
+    })
+      .then(response => {
+        resolve(response.data);
+      })
+      .catch(error => {
+        reject(error.data);
+      })
+  })
+}
+
+export function pushRiskSuggest(data){
+  return new Promise((resolve,reject) => {
+    let _url = '';
+    let mes = window.location;
+    let _baseurl = `//${mes.hostname}:${mes.port}`;
+    axios({
+      baseURL: _baseurl,
+      url: _url,
+      method: 'post',
+      data: {
+        //
+      }
+    })
+    .then(res => {
+      resolve(res.data);
+    })
+    .catch(err => {
+      reject(err.data);
+    })
+  })
+}
+
+export function pushMachineFineTune(data){
+  return new Promise((resolve,reject) => {
+    let _url = '';
+    let mes = window.location;
+    let _baseurl = `//${mes.hostname}:${mes.port}`;
+    axios({
+      baseURL: _baseurl,
+      url: _url,
+      method: 'post',
+      data: {
+        //
+      }
+    })
+    .then(res => {
+      resolve(res.data);
+    })
+    .catch(err => {
+      reject(err.data);
+    })
+  })
+}
