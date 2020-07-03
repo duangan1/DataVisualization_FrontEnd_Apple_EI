@@ -1,9 +1,6 @@
 <template>
   <div class="app-container">
-    <OptionBar 
-    ref="option"
-    @dataChanged="updateData" 
-    chartType="line_chart" />
+    <OptionBar ref="option" @dataChanged="updateData" chartType="line_chart" />
     <!-- rule box -->
     <div id="rule-box">
       <el-checkbox-group v-model="selectingRules">
@@ -13,6 +10,13 @@
         <el-checkbox label="deviation_detection" :disabled="!rulesBoxShow"></el-checkbox>
       </el-checkbox-group>
     </div>
+    <div id="origin-update-box" v-show="rulesBoxShow" style="margin-top:-1.5em;margin-left:46em;">
+      <el-radio-group v-model="originUpdateToggle" size="small">
+        <el-radio-button label="Origin"></el-radio-button>
+        <el-radio-button label="Update"></el-radio-button>
+      </el-radio-group>
+    </div>
+    <!-- chart title -->
     <title-of-project
       v-show="showVendorProjectTitle"
       :cellQualProjName="cellQual.projName"
@@ -106,7 +110,8 @@ export default {
       rulesBoxShow: false,
       //debug result
       debugDataAll: [],
-      detailViewDebugItem: {}
+      detailViewDebugItem: {},
+      originUpdateToggle: 'Origin',
     };
   },
   methods: {
@@ -317,6 +322,6 @@ export default {
   border-color: rgba(128, 128, 128, 0.185);
   padding: 2px;
   width: 45em;
-  margin-top: 4px;
+  margin-top: 8px;
 }
 </style>

@@ -30,7 +30,7 @@
                   type="text"
                   style="float: right;padding: 3px 0"
                   @click="popMachineFineTuneDialog()"
-                >New Record</el-button>
+                >Edit Judgement</el-button>
               </div>
               <el-table :data="debugTableData" border style="width: 100%">
                 <el-table-column prop="cp" label="Cp"></el-table-column>
@@ -38,6 +38,7 @@
                 <el-table-column prop="cpVal" label="Cp-val"></el-table-column>
                 <el-table-column prop="meanDriftVal" label="M-D-val"></el-table-column>
                 <el-table-column prop="judgement" label="judgement"></el-table-column>
+                <el-table-column prop="check" label="Check"></el-table-column>
               </el-table>
             </el-card>
           </el-col>
@@ -54,7 +55,7 @@
                   @click="popRiskSuggestDialog()"
                 >New Record</el-button>
               </div>
-              <el-table :data="riskTableData" border style="width: 100%">
+              <el-table :data="riskTableData" border height="500" style="width: 100%">
                 <el-table-column prop="ruleName" label="Rule Name"></el-table-column>
                 <el-table-column prop="level" label="Level"></el-table-column>
                 <el-table-column prop="dimPoint" label="DimNo-PointNum"></el-table-column>
@@ -64,13 +65,13 @@
         </el-row>
       </el-col>
     </el-row>
-
+    <!-- new risk record dailog -->
     <el-dialog
-    title="New Risk Record"
-    :fullscreen="false"
-    :modal="false"
-    :visible.sync="showRiskInput"
-    style="right:0px;"
+      title="New Risk Record"
+      :fullscreen="false"
+      :modal="false"
+      :visible.sync="showRiskInput"
+      style="right:0px;"
     >
       <el-row :gutter="20">
         <el-col :span="8">
@@ -88,26 +89,17 @@
         <el-button type="primary" style="right:0px;" @click="submitRiskSuggest()">Submit</el-button>
       </div>
     </el-dialog>
-
+    <!-- machine fine tune dailog -->
     <el-dialog
-    title="New Machine Fine Tune"
-    :fullscreen="false"
-    :modal="false"
-    :visible.sync="showMachineFineTuneInput"
-    style="right:0px;"
+      title="New Machine Fine Tune"
+      :fullscreen="false"
+      :modal="false"
+      :visible.sync="showMachineFineTuneInput"
+      style="right:0px;"
     >
-      <el-row :gutter="20">
+      <el-row>
         <el-col :span="4">
-          <el-input v-model="machineFineTuneInput.cp" placeholder="Cp"></el-input>
-        </el-col>
-        <el-col :span="5">
-          <el-input v-model="machineFineTuneInput.meanDrift" placeholder="Mean Drift"></el-input>
-        </el-col>
-        <el-col :span="5">
-          <el-input v-model="machineFineTuneInput.cpVal" placeholder="Cp-Val"></el-input>
-        </el-col>
-        <el-col :span="5">
-          <el-input v-model="machineFineTuneInput.meanDriftVal" placeholder="M-D-Val"></el-input>
+          <span style="display:inline;font-weight:bold;">Your Judgement:</span>
         </el-col>
         <el-col :span="5">
           <el-input v-model="machineFineTuneInput.judgement" placeholder="Judgement"></el-input>
@@ -159,16 +151,16 @@ export default {
       showMachineFineTuneInput: false,
       showFineTuneInput: false,
       riskInput: {
-        ruleName: '',
-        level:'',
-        dimPoint:''
+        ruleName: "",
+        level: "",
+        dimPoint: ""
       },
       machineFineTuneInput: {
-        cp: '',
-        meanDrift: '',
-        cpVal: '',
-        meanDriftVal: '',
-        judgement: ''
+        cp: "",
+        meanDrift: "",
+        cpVal: "",
+        meanDriftVal: "",
+        judgement: ""
       }
     };
   },
@@ -620,9 +612,20 @@ export default {
           meanDrift: debugData.mean_drift,
           cpVal: debugData.cp_val,
           meanDriftVal: debugData.mean_drift_val,
-          judgement: debugData.calc_debug_judgement
+          judgement: debugData.calc_debug_judgement,
+          check: ''
         });
       }
+      // else{
+      //   this.debugTableData.push({
+      //     cp: '',
+      //     meanDrift: '',
+      //     cpVal: '',
+      //     meanDriftVal: '',
+      //     judgement: '',
+      //     check:''
+      //   });
+      // }
     },
     popRiskSuggestDialog() {
       this.showRiskInput = true;
@@ -638,7 +641,6 @@ export default {
     },
     submitRiskSuggest() {
       //提交人为判断的 risk suggest 表单
-      
     },
     submitMachineFineTune() {
       //提交人为判断的Machine Fine Tune表单
