@@ -102,6 +102,46 @@ module.exports = {
           '^/python_api/param/': '/python_api/param/'
          }
       },
+      '/python_api/api_rule_dispersity/':{
+        target: 'http://120.26.177.17:5500', // 接口的域名
+        // secure: false,  // 如果是https接口，需要配置这个参数
+        changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
+        pathRewrite: {
+          '^/python_api/api_rule_dispersity/': '/python_api/api_rule_dispersity/'
+         }
+      },
+      '/python_api/api_rule_outlier/':{
+        target: 'http://120.26.177.17:5500', // 接口的域名
+        // secure: false,  // 如果是https接口，需要配置这个参数
+        changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
+        pathRewrite: {
+          '^/python_api/api_rule_outlier/': '/python_api/api_rule_outlier/'
+         }
+      },
+      '/python_api/api_rule_debug_judgement/':{
+        target: 'http://120.26.177.17:5500', // 接口的域名
+        // secure: false,  // 如果是https接口，需要配置这个参数
+        changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
+        pathRewrite: {
+          '^/python_api/api_rule_debug_judgement/': '/python_api/api_rule_debug_judgement/'
+         }
+      },
+      '/python_api/api_rule_point_risk_level/':{
+        target: 'http://120.26.177.17:5500', // 接口的域名
+        // secure: false,  // 如果是https接口，需要配置这个参数
+        changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
+        pathRewrite: {
+          '^/python_api/api_rule_point_risk_level/': '/python_api/api_rule_point_risk_level/'
+         }
+      },
+      '/python_api/api_rule_deviation_detection/':{
+        target: 'http://120.26.177.17:5500', // 接口的域名
+        // secure: false,  // 如果是https接口，需要配置这个参数
+        changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
+        pathRewrite: {
+          '^/python_api/api_rule_deviation_detection/': '/python_api/api_rule_deviation_detection/'
+         }
+      },
     },
   },
   configureWebpack: {

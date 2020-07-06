@@ -123,7 +123,7 @@
 
 <script>
 import echarts from "echarts";
-
+import * as dvApi from "@/api/ei/dv";
 export default {
   name: "DetailView",
   props: {
@@ -638,6 +638,7 @@ export default {
     },
     submitRiskSuggest() {
       //提交人为判断的 risk suggest 表单
+      
     },
     submitMachineFineTune() {
       //提交人为判断的Machine Fine Tune表单
