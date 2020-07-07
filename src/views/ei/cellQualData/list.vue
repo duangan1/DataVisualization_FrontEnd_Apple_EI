@@ -681,8 +681,8 @@ export default {
     },
     doCalculate() {
       let paramTemp = {
-        // header_id: this.currentRow.headerId,
-        header_id: 1
+        header_id: this.currentRow.headerId,
+        // header_id: 1
       };
       let type1 = "dispersity";
       let type2 = "outlier";
@@ -782,7 +782,7 @@ export default {
                             //算完了deviation detection，最后算dispersity
                             this.calculateStatus = "Calculating dispersity...";
                             dvApi
-                              .doRuleCalculate(type4, paramTemp)
+                              .doRuleCalculate(type1, paramTemp)
                               .then(data => {
                                 if (data.code == 200) {
                                   Message({
@@ -849,6 +849,8 @@ export default {
                   type: "error",
                   duration: 0
                 });
+                this.calculateLoading = false;
+                this.calculateStatus = "Calculate";
               }
             })
             .catch(err => {

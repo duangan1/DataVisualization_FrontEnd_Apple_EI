@@ -176,7 +176,7 @@ export default {
               this.debugDataAll = data;
               Message({
                 showClose: true,
-                message: "Load Debug info successfully",
+                message: "Load machine fine tune info successfully",
                 type: "success",
                 duration: 3000
               });

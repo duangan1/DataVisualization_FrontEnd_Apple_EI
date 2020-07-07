@@ -73,15 +73,57 @@
       :visible.sync="showRiskInput"
       style="right:0px;"
     >
+      <div id="risk-record-input-header-box" style="margin-bottom:4px;">
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <label>DimNO-PointNum</label>
+          </el-col>
+          <el-col :span="8">
+            <label>Rule Name</label>
+          </el-col>
+          <el-col :span="8">
+            <label>Level</label>
+          </el-col>
+        </el-row>
+      </div>
       <el-row :gutter="20">
-        <el-col :span="8">
-          <el-input v-model="riskInput.ruleName" placeholder="Rule Name"></el-input>
-        </el-col>
-        <el-col :span="8">
-          <el-input v-model="riskInput.level" placeholder="Level"></el-input>
-        </el-col>
-        <el-col :span="8">
+        <!-- <el-col :span="8">
           <el-input v-model="riskInput.dimPoint" placeholder="DimNo-PointNum"></el-input>
+        </el-col>-->
+        <!-- <el-col :span="1">
+          <span style="display:inline;font-weight:bold;">Dim-Point:</span>
+        </el-col>-->
+        <el-col :span="8">
+          <el-autocomplete
+            clearable
+            class="inline-input"
+            v-model="riskInput.dimPoint"
+            :fetch-suggestions="queryDimPointOptions"
+            placeholder="DimNo-PointNum"
+            @select="handleSelectDimPoint"
+          ></el-autocomplete>
+        </el-col>
+        <el-col :span="8">
+          <!-- <el-input v-model="riskInput.ruleName" placeholder="Rule Name"></el-input> -->
+          <el-select v-model="riskInput.ruleName" clearable placeholder="Rule Name">
+            <el-option
+              v-for="item in ruleNameOptions"
+              :key="item"
+              :label="item"
+              :value="item"
+            ></el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="8">
+          <!-- <el-input v-model="riskInput.level" placeholder="Level"></el-input> -->
+          <el-select v-model="riskInput.level" clearable placeholder="Level">
+            <el-option
+              v-for="item in levelOptions"
+              :key="item"
+              :label="item"
+              :value="item"
+            ></el-option>
+          </el-select>
         </el-col>
       </el-row>
       <div slot="footer" class="dialog-footer">
@@ -102,7 +144,15 @@
           <span style="display:inline;font-weight:bold;">Your Judgement:</span>
         </el-col>
         <el-col :span="5">
-          <el-input v-model="machineFineTuneInput.judgement" placeholder="Judgement"></el-input>
+          <!-- <el-input v-model="machineFineTuneInput.judgement" placeholder="Judgement"></el-input> -->
+          <el-select v-model="machineFineTuneInput.judgement" clearable placeholder="Judgement">
+            <el-option
+              v-for="item in machineFineTuneOptions"
+              :key="item"
+              :label="item"
+              :value="item"
+            ></el-option>
+          </el-select>
         </el-col>
       </el-row>
       <div slot="footer" class="dialog-footer">
@@ -116,6 +166,18 @@
 <script>
 import echarts from "echarts";
 import * as dvApi from "@/api/ei/dv";
+const pointRiskLevelLevels = [
+  'ok', 'ok*', 'Drawing Alert +', 'Drawing Alert -', 'SIP Alert +', 'SIP Alert -', 'SIP Reject +', 'SIP Reject -', 'Drawing Reject +', 'Drawing Reject -'
+];
+const outlierDetectionLevels = [
+  'outlier_ok', 'outlier_potential', 'outlier_risk',
+];
+const dispersionDetectionLevels = [
+  'dispersion_ok', 'dispersion_risk'
+];
+const samplesDeviationDetectionLevels = [
+  'samples_deviation_ok', 'samples_deviation_risk'
+]
 export default {
   name: "DetailView",
   props: {
@@ -156,12 +218,16 @@ export default {
         dimPoint: ""
       },
       machineFineTuneInput: {
-        cp: "",
-        meanDrift: "",
-        cpVal: "",
-        meanDriftVal: "",
+        // cp: "",
+        // meanDrift: "",
+        // cpVal: "",
+        // meanDriftVal: "",
         judgement: ""
-      }
+      },
+      machineFineTuneOptions: ["ok", "alert", "debug"],
+      dimPointOptions: [],
+      ruleNameOptions:['Point Risk Level', 'Outlier Detection', 'Dispersion Detection', 'Samples Deviation Detection'],
+      levelOptions:[],
     };
   },
   methods: {
@@ -185,6 +251,7 @@ export default {
       this.drawingData.forEach(item => {
         // console.log(item);
         xPointNumber.push(item.dim_no + "-" + item.pointNum);
+        this.dimPointOptions.push({ value: item.dim_no + "-" + item.pointNum }); //保存详情页的点位信息
         dev1Val.push(Number(item.dev1));
         dev2Val.push(Number(item.dev2));
         dev3Val.push(Number(item.dev3));
@@ -196,7 +263,6 @@ export default {
         sipTolPlusVal.push(Number(item.sipTolPlus));
         sipTolMinusVal.push(Number(item.sipTolPlus));
       });
-
       //determine dataZoom's end
       let xAxisLen = xPointNumber.length;
       let zoomEnd = 10;
@@ -613,7 +679,7 @@ export default {
           cpVal: debugData.cp_val,
           meanDriftVal: debugData.mean_drift_val,
           judgement: debugData.calc_debug_judgement,
-          check: ''
+          check: ""
         });
       }
       // else{
@@ -644,6 +710,20 @@ export default {
     },
     submitMachineFineTune() {
       //提交人为判断的Machine Fine Tune表单
+    },
+    queryDimPointOptions(queryString, cb) {
+      var dimPointOptions = this.dimPointOptions;
+      var result = queryString
+        ? dimPointOptions.filter(item => {
+            return (
+              item.value.toLowerCase().indexOf(queryString.toLowerCase()) != -1
+            );
+          })
+        : dimPointOptions;
+      cb(result);
+    },
+    handleSelectDimPoint(item) {
+      console.log(item);
     }
   },
   watch: {
@@ -653,6 +733,23 @@ export default {
         this.initPlot();
         this.formatTableData();
       }, 0);
+    },
+    'riskInput.ruleName': function(newval, oldval){
+      if(newval){
+        if(newval == 'Point Risk Level'){
+          this.levelOptions = pointRiskLevelLevels;
+          // console.log(this.levelOptions);
+        }
+        else if(newval == 'Outlier Detection'){
+          this.levelOptions =  outlierDetectionLevels;
+        }
+        else if(newval == 'Dispersion Detection'){
+          this.levelOptions =  dispersionDetectionLevels;
+        }
+        else if(newval == 'Samples Deviation Detection'){
+          this.levelOptions = samplesDeviationDetectionLevels;
+        }
+      }
     }
     // debugList: function(newval, oldval) {
     //   newval.forEach(item => {
