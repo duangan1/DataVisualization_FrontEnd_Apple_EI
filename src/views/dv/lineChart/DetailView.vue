@@ -43,6 +43,27 @@
             </el-card>
           </el-col>
         </el-row>
+        <!-- updated risk suggest card -->
+        <el-row>
+          <el-col :span="24">
+            <el-card :body-style="{padding:'2px'}">
+              <div slot="header" class="clearfix">
+                <span style="font-weight:bold;">Updated Risk Suggest</span>
+                <el-button
+                  type="text"
+                  style="float: right;padding: 3px 0"
+                  @click="popRiskSuggestDialog()"
+                >New Record</el-button>
+              </div>
+              <el-table :data="riskTableDataUpdated" border height="200" style="width: 100%">
+                <el-table-column prop="dimPoint" label="DimNo-PointNum"></el-table-column>
+                <el-table-column prop="ruleName" label="Rule Name"></el-table-column>
+                <el-table-column prop="level" label="Level"></el-table-column>
+                <el-table-column prop="check" label="Check"></el-table-column>
+              </el-table>
+            </el-card>
+          </el-col>
+        </el-row>
         <!-- Risk Suggest Card -->
         <el-row>
           <el-col :span="24">
@@ -55,7 +76,7 @@
                   @click="popRiskSuggestDialog()"
                 >New Record</el-button>
               </div>
-              <el-table :data="riskTableData" border height="500" style="width: 100%">
+              <el-table :data="riskTableData" border style="width: 100%" height="300">
                 <el-table-column prop="ruleName" label="Rule Name"></el-table-column>
                 <el-table-column prop="level" label="Level"></el-table-column>
                 <el-table-column prop="dimPoint" label="DimNo-PointNum"></el-table-column>
@@ -73,27 +94,53 @@
       :visible.sync="showRiskInput"
       style="right:0px;"
     >
+      <!-- header -->
       <div id="risk-record-input-header-box" style="margin-bottom:4px;">
         <el-row :gutter="20">
-          <el-col :span="8">
+          <el-col :span="6">
             <label>DimNO-PointNum</label>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="6">
             <label>Rule Name</label>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="6">
             <label>Level</label>
+          </el-col>
+          <el-col :span="6">
+            <label>Check</label>
           </el-col>
         </el-row>
       </div>
+      <!-- confirmed input item -->
+
+      <div
+        v-for="(item, index) in riskInputList"
+        :key="'inputlist-' + index"
+        style="margin-bottom:8px"
+      >
+        <el-row :gutter="20">
+          <el-col :span="6">
+            <!-- <label for="dimPoint">{{item.dimPoint}}</label> -->
+            <el-input placeholder :value="item.dimPoint" :disabled="true"></el-input>
+          </el-col>
+          <el-col :span="6">
+            <!-- <label for="ruleName">{{item.rule_name}}</label> -->
+            <el-input placeholder :value="item.rule_name" :disabled="true"></el-input>
+          </el-col>
+          <el-col :span="6">
+            <!-- <label for="Level">{{item.level}}</label> -->
+            <el-input placeholder :value="item.level" :disabled="true"></el-input>
+          </el-col>
+          <el-col :span="6">
+            <!-- <label for="Check">{{item.chk_result}}</label> -->
+            <el-input placeholder :value="item.chk_result" :disabled="true"></el-input>
+          </el-col>
+        </el-row>
+      </div>
+
+      <!-- input -->
       <el-row :gutter="20">
-        <!-- <el-col :span="8">
-          <el-input v-model="riskInput.dimPoint" placeholder="DimNo-PointNum"></el-input>
-        </el-col>-->
-        <!-- <el-col :span="1">
-          <span style="display:inline;font-weight:bold;">Dim-Point:</span>
-        </el-col>-->
-        <el-col :span="8">
+        <el-col :span="6">
           <el-autocomplete
             clearable
             class="inline-input"
@@ -102,33 +149,38 @@
             placeholder="DimNo-PointNum"
             @select="handleSelectDimPoint"
           ></el-autocomplete>
+          <span style="color:red;" v-show="showDimPointAlert">Please Input DimNo-PointNum</span>
         </el-col>
-        <el-col :span="8">
-          <!-- <el-input v-model="riskInput.ruleName" placeholder="Rule Name"></el-input> -->
-          <el-select v-model="riskInput.ruleName" clearable placeholder="Rule Name">
+        <el-col :span="6">
+          <el-select v-model="riskInput.rule_name" clearable placeholder="Rule Name">
             <el-option
               v-for="item in ruleNameOptions"
-              :key="item"
-              :label="item"
-              :value="item"
+              :key="item.label"
+              :label="item.label"
+              :value="item.value"
             ></el-option>
           </el-select>
         </el-col>
-        <el-col :span="8">
-          <!-- <el-input v-model="riskInput.level" placeholder="Level"></el-input> -->
-          <el-select v-model="riskInput.level" clearable placeholder="Level">
-            <el-option
-              v-for="item in levelOptions"
-              :key="item"
-              :label="item"
-              :value="item"
-            ></el-option>
+        <el-col :span="6">
+          <el-input placeholder="Level" v-model="riskInput.level" :disabled="true"></el-input>
+        </el-col>
+        <el-col :span="6">
+          <!-- <el-input v-model="riskInput.chk_result" placeholder="chk_result"></el-input> -->
+          <el-select v-model="riskInput.chk_result" clearable placeholder="Check">
+            <el-option v-for="item in levelOptions" :key="item" :label="item" :value="item"></el-option>
           </el-select>
         </el-col>
       </el-row>
+      <!-- add one more input item, add button -->
+      <el-button type="primary" @click="addOneMoreRiskInput()" style="margin-top:8px;">Add</el-button>
       <div slot="footer" class="dialog-footer">
         <el-button style="right:8px" @click="closeRiskSuggestDialog()">Cancel</el-button>
-        <el-button type="primary" style="right:0px;" @click="submitRiskSuggest()">Submit</el-button>
+        <el-button
+          type="primary"
+          style="right:0px;"
+          @click="submitRiskSuggestOrMachineFineTune('risk')"
+          :loading="submitLoading"
+        >{{submitText}}</el-button>
       </div>
     </el-dialog>
     <!-- machine fine tune dailog -->
@@ -145,7 +197,7 @@
         </el-col>
         <el-col :span="5">
           <!-- <el-input v-model="machineFineTuneInput.judgement" placeholder="Judgement"></el-input> -->
-          <el-select v-model="machineFineTuneInput.judgement" clearable placeholder="Judgement">
+          <el-select v-model="machineFineTuneInput.chk_result" clearable placeholder="Judgement">
             <el-option
               v-for="item in machineFineTuneOptions"
               :key="item"
@@ -157,7 +209,12 @@
       </el-row>
       <div slot="footer" class="dialog-footer">
         <el-button style="right:8px" @click="closeMachineFineTuneDialog()">Cancel</el-button>
-        <el-button type="primary" style="right:0px;" @click="submitMachineFineTune()">Submit</el-button>
+        <el-button
+          type="primary"
+          style="right:0px;"
+          @click="submitRiskSuggestOrMachineFineTune('machineFine')"
+          :loading="submitLoading"
+        >{{submitText}}</el-button>
       </div>
     </el-dialog>
   </el-dialog>
@@ -166,18 +223,30 @@
 <script>
 import echarts from "echarts";
 import * as dvApi from "@/api/ei/dv";
+import { MessageBox, Message, Loading } from "element-ui";
+import i18n from "@/i18n";
 const pointRiskLevelLevels = [
-  'ok', 'ok*', 'Drawing Alert +', 'Drawing Alert -', 'SIP Alert +', 'SIP Alert -', 'SIP Reject +', 'SIP Reject -', 'Drawing Reject +', 'Drawing Reject -'
+  "ok",
+  "ok*",
+  "Drawing Alert +",
+  "Drawing Alert -",
+  "SIP Alert +",
+  "SIP Alert -",
+  "SIP Reject +",
+  "SIP Reject -",
+  "Drawing Reject +",
+  "Drawing Reject -"
 ];
 const outlierDetectionLevels = [
-  'outlier_ok', 'outlier_potential', 'outlier_risk',
+  "outlier_ok",
+  "outlier_potential",
+  "outlier_risk"
 ];
-const dispersionDetectionLevels = [
-  'dispersion_ok', 'dispersion_risk'
-];
+const dispersionDetectionLevels = ["dispersion_ok", "dispersion_risk"];
 const samplesDeviationDetectionLevels = [
-  'samples_deviation_ok', 'samples_deviation_risk'
-]
+  "samples_deviation_ok",
+  "samples_deviation_risk"
+];
 export default {
   name: "DetailView",
   props: {
@@ -186,6 +255,10 @@ export default {
       required: true
     },
     rulesRiskData: {
+      type: Object,
+      required: true
+    },
+    rulesRiskDataUpdated: {
       type: Object,
       required: true
     },
@@ -200,38 +273,74 @@ export default {
     debugItem: {
       type: Object,
       required: true
+    },
+    debugItemUpdated: {
+      type: Object,
+      required: true
+    },
+    headerId: {
+      type: Number,
+      required: true
     }
   },
   data() {
     return {
       chartAearDom: Object,
       riskTableData: [],
-      debugTableData: [],
+      riskTableDataUpdated: [],
+      debugTableData: [
+        {
+          cp: "",
+          meanDrift: "",
+          cpVal: "",
+          meanDriftVal: "",
+          judgement: "",
+          check: ""
+        }
+      ],
       debugText: "",
       debugColor: "",
       showRiskInput: false,
       showMachineFineTuneInput: false,
       showFineTuneInput: false,
+      //人为判断结果上传
       riskInput: {
-        ruleName: "",
+        rule_name: "",
         level: "",
-        dimPoint: ""
+        dimPoint: "",
+        chk_result: "",
+        dim_no: "",
+        point_num: "",
+        header_id: "",
+        sam_no: ""
       },
+      riskInputList: [],
       machineFineTuneInput: {
-        // cp: "",
-        // meanDrift: "",
-        // cpVal: "",
-        // meanDriftVal: "",
-        judgement: ""
+        header_id: "",
+        rule_name: "debug_judgement",
+        sam_no: "",
+        chk_result: "",
+        point_num: "",
+        dim_no: ""
       },
       machineFineTuneOptions: ["ok", "alert", "debug"],
       dimPointOptions: [],
-      ruleNameOptions:['Point Risk Level', 'Outlier Detection', 'Dispersion Detection', 'Samples Deviation Detection'],
-      levelOptions:[],
+      ruleNameOptions: [
+        { label: "Point Risk Level", value: "point_risk_level" },
+        { label: "Outlier Detection", value: "outlier_detection" },
+        { label: "Dispersion Detection", value: "dispersion_detection" },
+        { label: "Samples Deviation Detection", value: "deviation_detection" }
+      ],
+      levelOptions: [],
+      rulesRiskDataFormatAll: [],
+      showDimPointAlert: false,
+      submitLoading: false,
+      submitText: "Submit"
     };
   },
   methods: {
     initPlot() {
+      //用的是drawing data, 会随着筛选条件变化
       // console.log(this.cncStation + "-chart");
       let chartDv = document.getElementById("chartDetailArea");
       // console.log(chartDv);
@@ -626,22 +735,61 @@ export default {
     },
     tableCurrentChange() {},
     closeDetail() {
+      this.rulesRiskDataFormatAll = [];
       this.$emit("closeDetail");
     },
     formatTableData() {
+      //用的是rulesDataAll， 不会随着筛选条件变化
       //risk table
-      this.riskTableData = [];
+      this.riskTableData = []; //risk suggest table data
+      // this.riskTableDataUpdated = []; //risk suggest updated table data, 需要和原始数据对比，不相同的展示
+      this.rulesRiskDataFormatAll = []; //用于 input 检索
       let dataAll = this.rulesRiskData;
+      //format riskInput form
+      this.riskInput.sam_no = this.cncStation;
+      this.riskInput.header_id = this.headerId;
+      //format machineFine form
+      this.machineFineTuneInput.sam_no = this.cncStation;
+      this.machineFineTuneInput.header_id = this.headerId;
       for (let ruleNameKey in dataAll) {
         for (let levelKey in dataAll[ruleNameKey]) {
-          if (levelKey == "NaN") {
-            break;
-          }
+          // console.log(levelKey);
+          //筛选出本台cnc的所有数据，并按点位规整
           if (dataAll[ruleNameKey][levelKey][this.cncStation]) {
-            let dimPointListString = "";
-            let cnt = 1;
             dataAll[ruleNameKey][levelKey][this.cncStation].forEach(
               pointItem => {
+                this.rulesRiskDataFormatAll.push({
+                  ruleName: ruleNameKey,
+                  level: levelKey,
+                  dimNo: pointItem.dim_no,
+                  pointNum: pointItem.point_num,
+                  dimNoPointNum: pointItem.dim_no + "-" + pointItem.point_num
+                });
+              }
+            );
+          }
+          if (
+            levelKey == "NaN" ||
+            levelKey == "ok" ||
+            levelKey == "dispersion_ok" ||
+            levelKey == "outlier_ok" ||
+            levelKey == "samples_deviation_ok"
+          ) {
+            //do nothing
+          } else if (dataAll[ruleNameKey][levelKey][this.cncStation]) {
+            let dimPointListString = "";
+            let cnt = 1;
+            //筛选出本台cnc的所有数据，并按点位规整
+            dataAll[ruleNameKey][levelKey][this.cncStation].forEach(
+              pointItem => {
+                this.rulesRiskDataFormatAll.push({
+                  ruleName: ruleNameKey,
+                  level: levelKey,
+                  dimNo: pointItem.dim_no,
+                  pointNum: pointItem.point_num,
+                  dimNoPointNum: pointItem.dim_no + "-" + pointItem.point_num
+                });
+                //拼凑表格字符串
                 if (cnt == 1) {
                   dimPointListString =
                     dimPointListString +
@@ -670,18 +818,38 @@ export default {
       }
 
       //debug table
-      this.debugTableData = [];
-      let debugData = this.debugItem;
-      if (this.debugItem) {
-        this.debugTableData.push({
-          cp: debugData.cp,
-          meanDrift: debugData.mean_drift,
-          cpVal: debugData.cp_val,
-          meanDriftVal: debugData.mean_drift_val,
-          judgement: debugData.calc_debug_judgement,
+      this.debugTableData = [
+        {
+          cp: "",
+          meanDrift: "",
+          cpVal: "",
+          meanDriftVal: "",
+          judgement: "",
           check: ""
-        });
+        }
+      ];
+      let debugData = this.debugItem;
+      let debugDataUpdated = this.debugItemUpdated;
+      if (debugData) {
+        this.debugTableData[0].cp = debugData.cp;
+        this.debugTableData[0].meanDrift = debugData.mean_drift;
+        this.debugTableData[0].cpVal = debugData.cp_val;
+        this.debugTableData[0].meanDriftVal = debugData.mean_drift_val;
+        this.debugTableData[0].judgement = debugData.calc_debug_judgement;
       }
+      if (debugDataUpdated) {
+        this.debugTableData[0].check = debugDataUpdated.chk_debug_judgement;
+      }
+      // if (this.debugItem) {
+      //   this.debugTableData.push({
+      //     cp: debugData.cp,
+      //     meanDrift: debugData.mean_drift,
+      //     cpVal: debugData.cp_val,
+      //     meanDriftVal: debugData.mean_drift_val,
+      //     judgement: debugData.calc_debug_judgement,
+      //     check: this.debugItemUpdated.chk_debug_judgement
+      //   });
+      // }
       // else{
       //   this.debugTableData.push({
       //     cp: '',
@@ -689,9 +857,50 @@ export default {
       //     cpVal: '',
       //     meanDriftVal: '',
       //     judgement: '',
-      //     check:''
+      //     check:this.debugItemUpdated.chk_debug_judgement
       //   });
       // }
+      // console.log(this.rulesRiskDataFormatAll);
+      this.formatRiskUpdatedTableData();
+    },
+    formatRiskUpdatedTableData() {
+      if (this.rulesRiskDataFormatAll) {
+        //用的是rulesDataAll，不会随着筛选条件变化
+        //比对 rulesRiskData 和 rulesRiskDataUpdated，不相同的给予展示
+        this.riskTableDataUpdated = []; //每次更新先清空
+        let dataAllFormatted = this.rulesRiskDataFormatAll;
+        // console.log(dataAllFormatted);
+        let dataUpdated = this.rulesRiskDataUpdated;
+        let cnc = this.cncStation;
+        for (let ruleNameKey in dataUpdated) {
+          for (let levelKey in dataUpdated[ruleNameKey]) {
+            //先筛选出本台cnc
+            if (dataUpdated[ruleNameKey][levelKey][cnc]) {
+              //判断更新后的结果和原来的是否相同，不同的给予展示
+              let itemUpdatedTemp = dataUpdated[ruleNameKey][levelKey][cnc];
+              itemUpdatedTemp.forEach(pointItem => {
+                let flag = false;
+                let itemFormatTemp = dataAllFormatted.filter(item => {
+                  return (
+                    item.dimNo == pointItem.dim_no &&
+                    item.pointNum == pointItem.point_num
+                  );
+                })[0];
+                // console.log(itemFormatTemp.length);
+                //再比较cal_result 和 chk_result 是否相同, 不同是加入riskTableDataUpdated
+                if (pointItem.chk_result != itemFormatTemp.level) {
+                  this.riskTableDataUpdated.push({
+                    dimPoint: pointItem.dim_no + "-" + pointItem.point_num,
+                    ruleName: ruleNameKey,
+                    level: itemFormatTemp.level,
+                    check: pointItem.chk_result
+                  });
+                }
+              });
+            }
+          }
+        }
+      }
     },
     popRiskSuggestDialog() {
       this.showRiskInput = true;
@@ -705,8 +914,144 @@ export default {
     closeMachineFineTuneDialog() {
       this.showMachineFineTuneInput = false;
     },
-    submitRiskSuggest() {
-      //提交人为判断的 risk suggest 表单
+    clearRiskInput() {
+      this.riskInput.rule_name = "";
+      this.riskInput.level = "";
+      this.riskInput.dimPoint = "";
+      this.riskInput.chk_result = "";
+      this.dim_no = "";
+      this.point_num = "";
+    },
+    submitRiskSuggestOrMachineFineTune(type) {
+      // console.log(this.riskInputList);
+      let formData = [];
+      if (type == "risk") {
+        //正在输入的表单判断是否有空后提交至list
+        if (
+          this.riskInput.rule_name != "" &&
+          this.riskInput.dimPoint != "" &&
+          this.riskInput.chk_result != ""
+        ) {
+          this.addOneMoreRiskInput();
+        }
+        formData = this.riskInputList;
+      } else {
+        if (this.machineFineTuneInput.chk_result == "") {
+          Message({
+            showClose: true,
+            message: "Please select your judgement before submit",
+            type: "warning",
+            duration: 3000
+          });
+          return;
+        } else {
+          formData = [this.machineFineTuneInput];
+        }
+      }
+      console.log(formData);
+      MessageBox.confirm(
+        "Do you want to upload these records",
+        i18n.t("core.tips"),
+        {
+          showClose: false,
+          confirmButtonText: "Confirm",
+          cancelButtonText: "Cancel",
+          type: "info",
+          dangerouslyUseHTMLString: true
+        }
+      ) //confirm 则上传数据
+        .then(() => {
+          this.submitLoading = true;
+          this.submitText = "Uploading...";
+          dvApi
+            .pushRiskSuggestOrMachineFineTune(formData)
+            .then(data => {
+              this.submitLoading = false;
+              this.submitText = "Submit";
+
+              if (data.code == 200) {
+                if (type == "risk") {
+                  //这是risk input 的处理
+                  this.clearRiskInput;
+                  this.riskInputList = [];
+                  this.closeRiskSuggestDialog();
+                  this.$emit("rulesUpdated");
+                } else {
+                  //machine fine tune 的处理
+                  this.closeMachineFineTuneDialog();
+                  this.debugTableData[0].check = this.machineFineTuneInput.chk_result;
+                  this.machineFineTuneInput.chk_result = "";
+                  this.$emit("debugUpdated");
+                }
+                Message({
+                  showClose: true,
+                  message: data.msg,
+                  type: "success",
+                  duration: 3000
+                });
+              } else {
+                Message({
+                  showClose: true,
+                  message: data.msg,
+                  type: "error",
+                  duration: 3000
+                });
+              }
+            })
+            .catch(err => {
+              this.submitLoading = false;
+              this.submitText = "Submit";
+              Message({
+                showClose: true,
+                message: "Upload Record failed, check error in console",
+                type: "error",
+                duration: 3000
+              });
+            });
+        });
+    },
+    addOneMoreRiskInput() {
+      // console.log(this.riskInput);
+      //添加前检查是否为空
+      let errType = "";
+      if (this.riskInput.rule_name == "") {
+        if (errType == "") {
+          errType = "Rule Name";
+        } else {
+          errType = errType + ", Rule Name";
+        }
+      }
+      if (this.riskInput.dimPoint == "") {
+        if (errType == "") {
+          errType = "DimNo-PointNum";
+        } else {
+          errType = errType + ", DimNo-PointNum";
+        }
+      }
+      if (this.riskInput.dimPoint == "") {
+        if (errType == "") {
+          errType = "Check Result";
+        } else {
+          errType = errType + ", Check Result";
+        }
+      }
+      if (errType == "") {
+        if (this.riskInput.level == "AutoFill") {
+          this.riskInput.level = "";
+        }
+        //深度拷贝，取消关联
+        let temp = JSON.stringify(this.riskInput);
+        this.riskInputList.push(JSON.parse(temp));
+        this.clearRiskInput();
+      } else {
+        let errMesage = errType + " can't be blank";
+        Message({
+          showClose: true,
+          message: errMesage,
+          type: "warning",
+          duration: 3000
+        });
+      }
     },
     submitMachineFineTune() {
       //提交人为判断的Machine Fine Tune表单
@@ -734,22 +1079,85 @@ export default {
         this.formatTableData();
       }, 0);
     },
-    'riskInput.ruleName': function(newval, oldval){
-      if(newval){
-        if(newval == 'Point Risk Level'){
+    "riskInput.rule_name": function(newval, oldval) {
+      if (newval) {
+        if (newval == "point_risk_level") {
           this.levelOptions = pointRiskLevelLevels;
           // console.log(this.levelOptions);
-        }
-        else if(newval == 'Outlier Detection'){
-          this.levelOptions =  outlierDetectionLevels;
-        }
-        else if(newval == 'Dispersion Detection'){
-          this.levelOptions =  dispersionDetectionLevels;
-        }
-        else if(newval == 'Samples Deviation Detection'){
+        } else if (newval == "outlier_detection") {
+          this.levelOptions = outlierDetectionLevels;
+        } else if (newval == "dispersion_detection") {
+          this.levelOptions = dispersionDetectionLevels;
+        } else if (newval == "deviation_detection") {
           this.levelOptions = samplesDeviationDetectionLevels;
+        } else {
+          //nothing else
         }
+        //检查dimPoint输入是否为空
+        //不空是，用dimPoint和rule_name检索this.rulesRiskDataFormatAll,自动补全level
+        if (this.riskInput.dimPoint == "") {
+          this.showDimPointAlert = true;
+        } else {
+          let rule_name = this.riskInput.rule_name;
+          // console.log(rule_name);
+          // console.log(this.rulesRiskDataFormatAll);
+          let dimPoint = this.riskInput.dimPoint;
+          let riskItem = this.rulesRiskDataFormatAll.filter(item => {
+            return rule_name == item.ruleName && dimPoint == item.dimNoPointNum;
+          })[0];
+          // console.log(riskItem);
+          this.riskInput.level = riskItem.level;
+          this.riskInput.dim_no = riskItem.dimNoPointNum.substring(
+            0,
+            riskItem.dimNoPointNum.indexOf("-")
+          );
+          let dimNoPointNumTemp = riskItem.dimNoPointNum;
+          this.riskInput.point_num = dimNoPointNumTemp.substring(
+            dimNoPointNumTemp.indexOf("-") + 1,
+            dimNoPointNumTemp.length
+          );
+          console.log("point_num" + this.riskInput.point_num);
+          // console.log(this.riskInput);
+        }
+      } else {
+        this.riskInput.level = "AutoFill";
+        this.levelOptions = [];
       }
+    },
+    "riskInput.dimPoint": function(newval, oldval) {
+      if (newval == "") {
+        this.riskInput.rule_name = "";
+        this.showDimPointAlert = true;
+      } else {
+        this.showDimPointAlert = false;
+        let rule_name = this.riskInput.rule_name;
+        // console.log(rule_name);
+        // console.log(this.rulesRiskDataFormatAll);
+        let dimPoint = this.riskInput.dimPoint;
+        let riskItem = this.rulesRiskDataFormatAll.filter(item => {
+          return rule_name == item.ruleName && dimPoint == item.dimNoPointNum;
+        })[0];
+        // console.log(riskItem);
+        this.riskInput.level = riskItem.level;
+        this.riskInput.dim_no = riskItem.dimNoPointNum.substring(
+          0,
+          riskItem.dimNoPointNum.indexOf("-")
+        );
+        this.riskInput.point_num = riskItem.dimNoPointNum.substring(
+          riskItem.indexOf("-") + 1,
+          riskItem.dimNoPointNum.length
+        );
+        console.log(this.riskInput.point_num);
+      }
+      // console.log(this.riskInput);
+    },
+    debugItemUpdated: function(newval, oldval) {
+      if (newval) {
+        this.debugTableData[0].check = newval.chk_result;
+      }
+    },
+    rulesRiskDataUpdated: function(newval, oldval) {
+      this.formatTableData();
     }
     // debugList: function(newval, oldval) {
     //   newval.forEach(item => {

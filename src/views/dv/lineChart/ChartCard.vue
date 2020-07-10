@@ -463,15 +463,24 @@ export default {
       }
     },
     debugList: function(newval, oldval) {
+      this.debugText = "";
       newval.forEach(item => {
         if (item.cnc_no == this.cncStation) {
-          this.debugText = item.calc_debug_judgement.replace(/^\S/, s => s.toUpperCase());
+          if(item.calc_debug_judgement){
+            this.debugText = item.calc_debug_judgement.replace(/^\S/, s => s.toUpperCase());
+          }
+          else if(item.chk_debug_judgement){
+            this.debugText = item.chk_debug_judgement.replace(/^\S/, s => s.toUpperCase());
+          }
           if (this.debugText == "Alert") {
             this.debugColor = 'rgba(255, 0, 0, 0.527)'
           }
           if (this.debugText == "Debug") {
             this.debugColor = 'rgba(255, 255, 0, 0.719)'
           }
+        }
+        else{
+          // this.debugText = "";
         }
       });
     }
