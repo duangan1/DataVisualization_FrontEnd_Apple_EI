@@ -1,9 +1,6 @@
 <template>
   <div class="app-container">
-    <OptionBar 
-    ref="option"
-    @dataChanged="updateData" 
-    chartType="line_chart" />
+    <OptionBar ref="option" @dataChanged="updateData" chartType="line_chart" />
     <!-- rule box -->
     <div id="rule-box">
       <el-checkbox-group v-model="selectingRules">
@@ -13,6 +10,13 @@
         <el-checkbox label="deviation_detection" :disabled="!rulesBoxShow"></el-checkbox>
       </el-checkbox-group>
     </div>
+    <div id="origin-update-box" v-show="rulesBoxShow" style="margin-top:-1.5em;margin-left:46em;">
+      <el-radio-group v-model="originUpdateToggle" size="small">
+        <el-radio-button label="Origin"></el-radio-button>
+        <el-radio-button label="Update"></el-radio-button>
+      </el-radio-group>
+    </div>
+    <!-- chart title -->
     <title-of-project
       v-show="showVendorProjectTitle"
       :cellQualProjName="cellQual.projName"
@@ -45,7 +49,7 @@
               :drawingData="item"
               :cncStation="key"
               :alertList="alertCncStation"
-              :debugList="debugDataAll"
+              :debugList="debugDataUsing"
               @showDetail="plotDetailView"
             />
           </el-col>
@@ -60,8 +64,13 @@
         :drawingData="detailDrawingData"
         :showChartDetails="showDetailView"
         :rulesRiskData="rulesDataAll"
+        :rulesRiskDataUpdated="rulesDataAllUpdated"
         :debugItem="detailViewDebugItem"
+        :debugItemUpdated="detailViewDebugItemUpdated"
+        :headerId="headerId"
         @closeDetail="closeDetailView"
+        @rulesUpdated="ruleshouldUpdate"
+        @debugUpdated="debugshouldUpdate"
       />
     </el-row>
   </div>
@@ -100,13 +109,22 @@ export default {
       detailCncStation: "",
       detailDrawingData: [],
       //filter rule risk
+      rulesDataUsing: {},
       rulesDataAll: {},
+      rulesDataAllUpdated: {},
       selectingRules: [],
       alertCncStation: [],
+      riskDatashouldUpdate: false,
       rulesBoxShow: false,
       //debug result
+      debugDataUsing: [],
       debugDataAll: [],
-      detailViewDebugItem: {}
+      debugDataAllUpdated: [],
+      detailViewDebugItem: {},
+      detailViewDebugItemUpdated: {},
+      debugDataShouldUpdate: false,
+      //rule source toggle
+      originUpdateToggle: "Origin"
     };
   },
   methods: {
@@ -139,6 +157,7 @@ export default {
           .then(data => {
             // console.log('got rules');
             this.rulesDataAll = data;
+            this.rulesDataUsing = data;
             // console.log(this.rulesDataAll);
             this.rulesBoxShow = true;
             Message({
@@ -169,9 +188,10 @@ export default {
               });
             } else {
               this.debugDataAll = data;
+              this.debugDataUsing = data;
               Message({
                 showClose: true,
-                message: "Load Debug info successfully",
+                message: "Load machine fine tune info successfully",
                 type: "success",
                 duration: 3000
               });
@@ -185,6 +205,10 @@ export default {
               duration: 3000
             });
           });
+        //get debug updated
+        this.getDebugDataUpdated();
+        //get rules updated
+        this.getRulesDataUpdated();
       }
     },
     fillDimNoLookup() {
@@ -204,6 +228,10 @@ export default {
       this.detailViewDebugItem = this.debugDataAll.filter(item => {
         return item.cnc_no == data;
       })[0];
+      this.detailViewDebugItemUpdated = this.debugDataAllUpdated.filter(item => {
+        return item.cnc_no == data;
+      })[0];
+      // console.log(this.detailViewDebugItemUpdated);
       // console.log(this.detailViewDebugItem);
       // console.log(this.detailDrawingData);
       this.showDetailView = true;
@@ -249,6 +277,76 @@ export default {
         }
       }
       return temp;
+    },
+    getDebugDataUpdated() {
+      dvApi
+        .getLineChartDebugCheck(this.headerId)
+        .then(data => {
+          if (typeof data == "string") {
+            Message({
+              showClose: true,
+              message: data,
+              type: "warning",
+              duration: 3000
+            });
+          } else {
+            this.debugDataAllUpdated = data;
+            // console.log("dabugDataAllUpdated");
+            // console.log(this.debugDataAllUpdated);
+            this.debugDataShouldUpdate = false;
+            Message({
+              showClose: true,
+              message: "Load updated machine fine tune info successfully",
+              type: "success",
+              duration: 3000
+            });
+          }
+        })
+        .catch(error => {
+          Message({
+            showClose: true,
+            message: "Load updated debug judgement failed: " + error,
+            type: "error",
+            duration: 3000
+          });
+        });
+    },
+    getRulesDataUpdated() {
+      dvApi
+        .getLineChartRulesCheck(this.headerId)
+        .then(data => {
+          if (typeof data == "string") {
+            Message({
+              showClose: true,
+              message: data,
+              type: "warning",
+              duration: 3000
+            });
+          } else {
+            this.rulesDataAllUpdated = data;
+            this.riskDatashouldUpdate = false;
+            Message({
+              showClose: true,
+              message: "Load updated rules info successfully",
+              type: "success",
+              duration: 3000
+            });
+          }
+        })
+        .catch(error => {
+          Message({
+            showClose: true,
+            message: "Load updated rules info failed: " + error,
+            type: "error",
+            duration: 3000
+          });
+        });
+    },
+    ruleshouldUpdate(){
+      this.riskDatashouldUpdate = true;
+    },
+    debugshouldUpdate(){
+      this.debugDataShouldUpdate = true;
     }
   },
   watch: {
@@ -285,19 +383,61 @@ export default {
     selectingRules: function(newval, oldval) {
       //新增选择
       // console.log('selectingRules changing');
+      // console.log(this.selectingRules);
       let rules = this.selectingRules;
-      let rulesDataAll = this.rulesDataAll;
+      let rulesDataUsing = this.rulesDataUsing;
       this.alertCncStation = [];
       rules.forEach(ruleItem => {
-        for (let riskLevelItemKey in rulesDataAll[ruleItem]) {
-          for (let key in rulesDataAll[ruleItem][riskLevelItemKey]) {
-            if (this.alertCncStation.indexOf(key) == -1) {
-              this.alertCncStation.push(key);
+        for (let riskLevelItemKey in rulesDataUsing[ruleItem]) {
+          if (
+            riskLevelItemKey == "NaN" ||
+            riskLevelItemKey == "ok" ||
+            riskLevelItemKey == "dispersion_ok" ||
+            riskLevelItemKey == "outlier_ok" ||
+            riskLevelItemKey == "samples_deviation_ok"
+          ) {
+            continue;
+          } else {
+            for (let key in rulesDataUsing[ruleItem][riskLevelItemKey]) {
+              if (this.alertCncStation.indexOf(key) == -1) {
+                this.alertCncStation.push(key);
+              }
             }
           }
         }
       });
       //取消选择, 采用每次清空重新遍历的方式
+    },
+    originUpdateToggle: function(newval, oldval) {
+      console.log(newval);
+      if (newval == "Origin") {
+        this.rulesDataUsing = this.rulesDataAll;
+        this.debugDataUsing = this.debugDataAll;
+      } else if (newval == "Update") {
+        this.rulesDataUsing = this.rulesDataAllUpdated;
+        this.debugDataUsing = this.debugDataAllUpdated;
+        // if(this.riskDatashouldUpdate){
+        //   this.getRulesDataUpdated();
+        //   this.rulesDataUsing = this.rulesDataAllUpdated;
+        // }
+        // if(this.debugDataShouldUpdate){
+        //   this.getDebugDataUpdated();
+        //   this.debugDataUsing = this.debugDataAllUpdated;
+        // }
+      }
+    },
+    riskDatashouldUpdate: function(newval, oldval){
+      if(newval){
+        this.getRulesDataUpdated();
+      }
+    },
+    debugDataShouldUpdate: function(newval, oldval){
+      if(newval){
+        this.getDebugDataUpdated();
+      }
+    },
+    debugDataAllUpdated: function(newval, oldval){
+
     }
   }
 };
@@ -317,6 +457,6 @@ export default {
   border-color: rgba(128, 128, 128, 0.185);
   padding: 2px;
   width: 45em;
-  margin-top: 4px;
+  margin-top: 8px;
 }
 </style>

@@ -417,8 +417,8 @@ export default {
         mean_drift_val: [{ validator: this.limit0to1, trigger: "blur" }],
         dispersity_val: [{ validator: this.limit0to1, trigger: "blur" }]
       },
-      calculateStatus: 'Calculate',
-      calculateLoading: false,
+      calculateStatus: "Calculate",
+      calculateLoading: false
     };
   },
   mounted() {
@@ -682,7 +682,7 @@ export default {
     doCalculate() {
       let paramTemp = {
         header_id: this.currentRow.headerId,
-        param_id: 1
+        // header_id: 1
       };
       let type1 = "dispersity";
       let type2 = "outlier";
@@ -702,100 +702,125 @@ export default {
       )
         .then(() => {
           this.calculateLoading = true;
-          this.calculateStatus = 'Calculating Dispersity...';
+          this.calculateStatus = "Calculating point risk level...";
           //point risk level calculation
-          //point risk 超时，暂时先算despersity 1
           dvApi
-            .doRuleCalculate(type1, paramTemp)
+            .doRuleCalculate(type5, paramTemp)
             .then(data => {
               if (data.code == 200) {
                 Message({
                   showClose: true,
-                  message: "dispersity finished.",
+                  message: data.msg,
                   type: "success",
-                  duration: 3000
+                  duration: 0
                 });
                 //算完point risk level 后才能算其他的
                 /* **************************** */
                 //debug judgement 3
-                this.calculateStatus = 'Calculating Debug Judgement...';
+                this.calculateStatus = "Calculating Debug Judgement...";
                 dvApi
                   .doRuleCalculate(type3, paramTemp)
                   .then(data => {
                     if (data.code == 200) {
                       Message({
                         showClose: true,
-                        message: "debug judegement finished",
+                        message: data.msg,
                         type: "success",
-                        duration: 3000
+                        duration: 0
                       });
                     } else {
                       Message({
                         showClose: true,
                         message: data.msg,
                         type: "error",
-                        duration: 3000
+                        duration: 0
                       });
                     }
                     //算完了debug，请求算outlier
                     //outlier calculation 2
-                    this.calculateStatus = 'Calculating Outlier...';
+                    this.calculateStatus = "Calculating Outlier...";
                     dvApi
                       .doRuleCalculate(type2, paramTemp)
                       .then(data => {
-                        if(data.code == 200){
+                        if (data.code == 200) {
                           Message({
-                          showClose: true,
-                          message: "outlier finished",
-                          type: "success",
-                          duration: 3000
-                        });
-                        }
-                        else{
+                            showClose: true,
+                            message: data.msg,
+                            type: "success",
+                            duration: 0
+                          });
+                        } else {
                           Message({
-                          showClose: true,
-                          message: data.msg,
-                          type: "error",
-                          duration: 3000
-                        });
-
+                            showClose: true,
+                            message: data.msg,
+                            type: "error",
+                            duration: 0
+                          });
                         }
                         //算完了outlier，请求算deviation_detection
                         //deviation calculate 4
-                        this.calculateStatus = 'Calculating Deviation...';
+                        this.calculateStatus = "Calculating Deviation...";
                         dvApi
                           .doRuleCalculate(type4, paramTemp)
                           .then(data => {
-                            if(data.code == 200){
+                            if (data.code == 200) {
                               Message({
-                              showClose: true,
-                              message: "deviation finished",
-                              type: "success",
-                              duration: 3000
-                            });
-                            }
-                            else{
+                                showClose: true,
+                                message: data.msg,
+                                type: "success",
+                                duration: 0
+                              });
+                            } else {
                               Message({
-                              showClose: true,
-                              message: data.msg,
-                              type: "error",
-                              duration: 3000
-                            });
+                                showClose: true,
+                                message: data.msg,
+                                type: "error",
+                                duration: 0
+                              });
                             }
+
+                            //算完了deviation detection，最后算dispersity
+                            this.calculateStatus = "Calculating dispersity...";
+                            dvApi
+                              .doRuleCalculate(type1, paramTemp)
+                              .then(data => {
+                                if (data.code == 200) {
+                                  Message({
+                                    showClose: true,
+                                    message: data.msg,
+                                    type: "success",
+                                    duration: 0
+                                  });
+                                } else {
+                                  Message({
+                                    showClose: true,
+                                    message: data.msg,
+                                    type: "error",
+                                    duration: 0
+                                  });
+                                }
+                              })
+                              .catch(err => {
+                                Message({
+                                  showClose: true,
+                                  message:
+                                    "rule dispersity failed to be created" + err,
+                                })
+                              });
+
                             this.calculateLoading = false;
-                            this.calculateStatus = 'Calculate';
+                            this.calculateStatus = "Calculate";
                           })
                           .catch(err => {
                             Message({
                               showClose: true,
                               message:
-                                "rule deviation failed to be created" +
-                                err.msg,
+                                "rule deviation failed to be created" + err.msg,
                               type: "error",
-                              duration: 3000
+                              duration: 0
                             });
                             this.calculateLoading = false;
-                            this.calculateStatus = 'Calculate';
+                            this.calculateStatus = "Calculate";
                           });
                       })
                       .catch(err => {
@@ -804,7 +829,7 @@ export default {
                           message:
                             "rule outlier failed to be created" + err.msg,
                           type: "error",
-                          duration: 3000
+                          duration: 0
                         });
                       });
                   })
@@ -814,7 +839,7 @@ export default {
                       message:
                         "rule debug judgement failed to be created" + err.msg,
                       type: "error",
-                      duration: 3000
+                      duration: 0
                     });
                   });
               } else {
@@ -822,8 +847,10 @@ export default {
                   showClose: true,
                   message: data.msg,
                   type: "error",
-                  duration: 3000
+                  duration: 0
                 });
+                this.calculateLoading = false;
+                this.calculateStatus = "Calculate";
               }
             })
             .catch(err => {
@@ -831,10 +858,10 @@ export default {
                 showClose: true,
                 message: "rule risk level failed to be created" + err.msg,
                 type: "error",
-                duration: 3000
+                duration: 0
               });
               this.calculateLoading = false;
-              this.calculateStatus = 'Calculate';
+              this.calculateStatus = "Calculate";
             });
         })
         .catch(() => {

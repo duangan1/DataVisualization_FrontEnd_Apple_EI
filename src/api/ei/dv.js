@@ -197,9 +197,29 @@ export function doRuleCalculate(type, paramData){
   })
 }
 
-export function pushRiskSuggest(data){
+export function pushRiskSuggestOrMachineFineTune(data){
   return new Promise((resolve,reject) => {
-    let _url = '';
+    let _url = '/python_api/user_defined_linechart_rules/';
+    let mes = window.location;
+    let _baseurl = `//${mes.hostname}:${mes.port}`;
+    axios({
+      baseURL: _baseurl,
+      url: _url,
+      method: 'post',
+      data: data
+    })
+    .then(res => {
+      resolve(res.data);
+    })
+    .catch(err => {
+      reject(err.data);
+    })
+  })
+}
+
+export function pushMachineFineTune(data){
+  return new Promise((resolve,reject) => {
+    let _url = '/python_api/user_defined_linechart_rules/';
     let mes = window.location;
     let _baseurl = `//${mes.hostname}:${mes.port}`;
     axios({
@@ -219,9 +239,9 @@ export function pushRiskSuggest(data){
   })
 }
 
-export function pushMachineFineTune(data){
-  return new Promise((resolve,reject) => {
-    let _url = '';
+export function getLineChartRulesCheck(header_id) {
+  return new Promise((resolve, reject) => {
+    let _url = '/python_api/chk_api_visual_linechart_rules/';
     let mes = window.location;
     let _baseurl = `//${mes.hostname}:${mes.port}`;
     axios({
@@ -229,14 +249,36 @@ export function pushMachineFineTune(data){
       url: _url,
       method: 'post',
       data: {
-        //
+        header_id: header_id,
       }
     })
-    .then(res => {
-      resolve(res.data);
+      .then(response => {
+        resolve(response.data);
+      })
+      .catch(error => {
+        reject(error.data);
+      })
+  })
+}
+
+export function getLineChartDebugCheck(header_id) {
+  return new Promise((resolve, reject) => {
+    let _url = '/python_api/chk_api_visual_line_chart_debug/';
+    let mes = window.location;
+    let _baseurl = `//${mes.hostname}:${mes.port}`;
+    axios({
+      baseURL: _baseurl,
+      url: _url,
+      method: 'post',
+      data: {
+        header_id: header_id,
+      }
     })
-    .catch(err => {
-      reject(err.data);
-    })
+      .then(response => {
+        resolve(response.data);
+      })
+      .catch(error => {
+        reject(error.data);
+      })
   })
 }
