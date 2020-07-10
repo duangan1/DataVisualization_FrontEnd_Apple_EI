@@ -282,3 +282,45 @@ export function getLineChartDebugCheck(header_id) {
       })
   })
 }
+
+export function getHotMapChkresult(header_id){
+  return new Promise((resolve,reject) => {
+    let _url = '/python_api/chk_api_visual_heat_map/';
+    let mes = window.location;
+    let _baseurl = `//${mes.hostname}:${mes.port}`;
+    axios({
+      baseURL: _baseurl,
+      url: _url,
+      method: 'post',
+      data: {
+        header_id: header_id,
+      }
+    })
+    .then(res => {
+      resolve(res.data);
+    })
+    .catch(err => {
+      reject(err.data);
+    })
+  })
+}
+
+export function pushUserDefinedHotmapRules(data){
+  return new Promise((resolve,reject) => {
+    let _url = '/python_api/user_defined_hotmap_rules/';
+    let mes = window.location;
+    let _baseurl = `//${mes.hostname}:${mes.port}`;
+    axios({
+      baseURL: _baseurl,
+      url: _url,
+      method: 'post',
+      data: data
+    })
+    .then(res => {
+      resolve(res.data);
+    })
+    .catch(err => {
+      reject(err.data);
+    })
+  })
+}
